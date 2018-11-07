@@ -135,7 +135,8 @@ oneOf parsers state =
                 Err _ ->
                     parser state
     in
-        List.foldl step (fail "expected one of the parsers to match" state) parsers
+        List.foldl step (Err "") parsers
+            |> Result.mapError (\_ -> "expected one of the parsers to match")
 
 
 peek : Int -> State -> List Char

@@ -54,6 +54,12 @@ suite =
                         |> Parser.andThen (\_ -> Parser.anyChar)
                         |> Parser.parse "hello world"
                         |> Expect.equal (Ok ' ')
+            , test "it fails if none of the choices succeed" <|
+                \_ ->
+                    Parser.oneOf [ Parser.string "goodbye", Parser.string "hello" ]
+                        |> Parser.andThen (\_ -> Parser.anyChar)
+                        |> Parser.parse "yolo"
+                        |> Expect.equal (Err "expected one of the parsers to match")
             ]
         , describe "zeroOrMore"
             [ test "it succeeds if there are no matches" <|
@@ -66,6 +72,11 @@ suite =
                     Parser.zeroOrMore (Parser.char 'x')
                         |> Parser.parse "xyy"
                         |> Expect.equal (Ok [ 'x' ])
+            , test "it matches many times" <|
+                \_ ->
+                    Parser.zeroOrMore (Parser.char 'x')
+                        |> Parser.parse "xxy"
+                        |> Expect.equal (Ok [ 'x', 'x' ])
             ]
         , describe "oneOrMore"
             [ test "it fails if there are no matches" <|
