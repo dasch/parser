@@ -41,4 +41,18 @@ suite =
                         |> Parser.parse "hello world"
                         |> Expect.equal (Ok 'o')
             ]
+        , describe "oneOf"
+            [ test "it can pick the first choice" <|
+                \_ ->
+                    Parser.oneOf [ Parser.string "hello", Parser.string "goodbye" ]
+                        |> Parser.andThen (\_ -> Parser.anyChar)
+                        |> Parser.parse "hello world"
+                        |> Expect.equal (Ok ' ')
+            , test "it can pick the second choice" <|
+                \_ ->
+                    Parser.oneOf [ Parser.string "goodbye", Parser.string "hello" ]
+                        |> Parser.andThen (\_ -> Parser.anyChar)
+                        |> Parser.parse "hello world"
+                        |> Expect.equal (Ok ' ')
+            ]
         ]

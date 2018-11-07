@@ -35,6 +35,11 @@ succeed val state =
     Ok ( state, val )
 
 
+fail : String -> Parser a
+fail str state =
+    Err str
+
+
 char : Char -> Parser ()
 char chr state =
     if peek 1 state == [ chr ] then
@@ -65,6 +70,21 @@ andThen next parser state =
     parser state
         |> Result.andThen
             (\( newState, val ) -> next val newState)
+
+
+oneOf : List (Parser a) -> Parser a
+oneOf parsers state =
+    let
+        step : Parser a -> Result String ( State, a ) -> Result String ( State, a )
+        step parser tmp =
+            case tmp of
+                Ok ( newState, val ) ->
+                    Ok ( newState, val )
+
+                Err _ ->
+                    parser state
+    in
+        List.foldl step (fail "expected one of the parsers to match" state) parsers
 
 
 peek : Int -> State -> List Char
