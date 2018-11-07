@@ -30,6 +30,24 @@ parse input parser =
             Err err
 
 
+int : Parser Int
+int =
+    let
+        digit : Parser Char
+        digit =
+            oneOf (List.map char [ '0', '1', '2', '3', '4', '5', '6', '7', '8', '9' ])
+
+        parseInt : List Char -> State -> Result String ( State, Int )
+        parseInt digits newState =
+            String.fromList digits
+                |> String.toInt
+                |> Result.fromMaybe "invalid int"
+                |> Result.map (\x -> ( newState, x ))
+    in
+        oneOrMore digit
+            |> andThen (\digits -> parseInt digits)
+
+
 oneOrMore : Parser a -> Parser (List a)
 oneOrMore parser =
     parser
@@ -72,10 +90,10 @@ isAtEnd state =
     List.isEmpty state.remaining
 
 
-char : Char -> Parser ()
+char : Char -> Parser Char
 char chr state =
     if peek 1 state == [ chr ] then
-        Ok ( advance 1 state, () )
+        Ok ( advance 1 state, chr )
     else
         Err "expected char"
 
@@ -85,7 +103,9 @@ string str state =
     let
         step : Char -> Result String ( State, () ) -> Result String ( State, () )
         step chr tmp =
-            Result.andThen (\( newState, () ) -> char chr newState) tmp
+            tmp
+                |> Result.andThen (\( newState, _ ) -> char chr newState)
+                |> Result.map (\( newState, _ ) -> ( newState, () ))
     in
         List.foldl step (succeed () state) (String.toList str)
 

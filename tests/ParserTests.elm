@@ -20,7 +20,7 @@ suite =
                 \_ ->
                     Parser.char 'h'
                         |> Parser.parse "hello world"
-                        |> Expect.equal (Ok ())
+                        |> Expect.equal (Ok 'h')
             , test "advances the position" <|
                 \_ ->
                     Parser.char 'h'
@@ -65,7 +65,7 @@ suite =
                 \_ ->
                     Parser.zeroOrMore (Parser.char 'x')
                         |> Parser.parse "xyy"
-                        |> Expect.equal (Ok [ () ])
+                        |> Expect.equal (Ok [ 'x' ])
             ]
         , describe "oneOrMore"
             [ test "it fails if there are no matches" <|
@@ -77,11 +77,18 @@ suite =
                 \_ ->
                     Parser.oneOrMore (Parser.char 'x')
                         |> Parser.parse "xyy"
-                        |> Expect.equal (Ok [ () ])
+                        |> Expect.equal (Ok [ 'x' ])
             , test "it matches many times" <|
                 \_ ->
                     Parser.oneOrMore (Parser.char 'x')
                         |> Parser.parse "xxy"
-                        |> Expect.equal (Ok [ (), () ])
+                        |> Expect.equal (Ok [ 'x', 'x' ])
+            ]
+        , describe "int"
+            [ test "it matches an integer" <|
+                \_ ->
+                    Parser.int
+                        |> Parser.parse "42yolo"
+                        |> Expect.equal (Ok 42)
             ]
         ]
