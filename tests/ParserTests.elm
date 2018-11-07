@@ -33,7 +33,7 @@ suite =
                 \_ ->
                     Parser.string "hello"
                         |> Parser.parse "hello world"
-                        |> Expect.equal (Ok ())
+                        |> Expect.equal (Ok "hello")
             , test "advances the position" <|
                 \_ ->
                     Parser.string "hell"

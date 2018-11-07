@@ -97,16 +97,29 @@ char chr state =
         Err "expected char"
 
 
-string : String -> Parser ()
-string str state =
-    let
-        step : Char -> Result String ( State, () ) -> Result String ( State, () )
-        step chr tmp =
-            tmp
-                |> Result.andThen (\( newState, _ ) -> char chr newState)
-                |> Result.map (\( newState, _ ) -> ( newState, () ))
-    in
-        List.foldl step (succeed () state) (String.toList str)
+string : String -> Parser String
+string str =
+    String.toList str
+        |> List.map char
+        |> sequence
+        |> map String.fromList
+
+
+map : (a -> b) -> Parser a -> Parser b
+map f parser =
+    parser
+        |> andThen (\x -> succeed (f x))
+
+
+sequence : List (Parser a) -> Parser (List a)
+sequence parsers =
+    case parsers of
+        [] ->
+            succeed []
+
+        parser :: rest ->
+            parser
+                |> andThen (\x -> map (\xs -> x :: xs) (sequence rest))
 
 
 anyChar : Parser Char
