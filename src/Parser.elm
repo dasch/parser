@@ -58,11 +58,7 @@ int =
 oneOrMore : Parser a -> Parser (List a)
 oneOrMore parser =
     parser
-        |> andThen
-            (\val ->
-                zeroOrMore parser
-                    |> andThen (\rest -> succeed (val :: rest))
-            )
+        |> andThen (\val -> map ((::) val) (zeroOrMore parser))
 
 
 zeroOrMore : Parser a -> Parser (List a)
