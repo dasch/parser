@@ -119,6 +119,14 @@ advance length state =
     }
 
 
+end : Parser ()
+end state =
+    if state.remaining == [] then
+        Ok ( state, () )
+    else
+        Err "expected end"
+
+
 anyChar : Parser Char
 anyChar state =
     List.head state.remaining

@@ -41,6 +41,19 @@ suite =
                         |> Parser.parse "hello world"
                         |> Expect.equal (Ok 'o')
             ]
+        , describe "end"
+            [ test "matches the end of the input" <|
+                \_ ->
+                    Parser.string "hello"
+                        |> Parser.andThen (\_ -> Parser.end)
+                        |> Parser.parse "hello"
+                        |> Expect.equal (Ok ())
+            , test "does not match anything but the end of the input" <|
+                \_ ->
+                    Parser.end
+                        |> Parser.parse "hello"
+                        |> Expect.equal (Err "expected end")
+            ]
         , describe "oneOf"
             [ test "it can pick the first choice" <|
                 \_ ->
