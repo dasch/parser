@@ -30,12 +30,27 @@ parse input parser =
             Err err
 
 
+succeed : a -> Parser a
+succeed val state =
+    Ok ( state, val )
+
+
 char : Char -> Parser ()
 char chr state =
     if peek 1 state == [ chr ] then
         Ok ( advance 1 state, () )
     else
         Err "expected char"
+
+
+string : String -> Parser ()
+string str state =
+    let
+        step : Char -> Result String ( State, () ) -> Result String ( State, () )
+        step chr tmp =
+            Result.andThen (\( newState, () ) -> char chr newState) tmp
+    in
+        List.foldl step (succeed () state) (String.toList str)
 
 
 anyChar : Parser Char
@@ -47,12 +62,9 @@ anyChar state =
 
 andThen : (a -> Parser b) -> Parser a -> Parser b
 andThen next parser state =
-    case parser state of
-        Ok ( newState, val ) ->
-            next val newState
-
-        Err err ->
-            Err err
+    parser state
+        |> Result.andThen
+            (\( newState, val ) -> next val newState)
 
 
 peek : Int -> State -> List Char

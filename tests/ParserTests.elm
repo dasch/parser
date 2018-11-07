@@ -28,4 +28,17 @@ suite =
                         |> Parser.parse "hello world"
                         |> Expect.equal (Ok 'e')
             ]
+        , describe "string"
+            [ test "matches the exact characters" <|
+                \_ ->
+                    Parser.string "hello"
+                        |> Parser.parse "hello world"
+                        |> Expect.equal (Ok ())
+            , test "advances the position" <|
+                \_ ->
+                    Parser.string "hell"
+                        |> Parser.andThen (\_ -> Parser.anyChar)
+                        |> Parser.parse "hello world"
+                        |> Expect.equal (Ok 'o')
+            ]
         ]
