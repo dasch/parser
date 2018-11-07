@@ -30,6 +30,12 @@ parse input parser =
             Err err
 
 
+withError : String -> Parser a -> Parser a
+withError msg parser state =
+    parser state
+        |> Result.mapError (\_ -> msg)
+
+
 int : Parser Int
 int =
     let
@@ -46,6 +52,7 @@ int =
     in
         oneOrMore digit
             |> andThen (\digits -> parseInt digits)
+            |> withError "expected int"
 
 
 oneOrMore : Parser a -> Parser (List a)

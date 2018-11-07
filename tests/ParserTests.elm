@@ -90,5 +90,10 @@ suite =
                     Parser.int
                         |> Parser.parse "42yolo"
                         |> Expect.equal (Ok 42)
+            , test "it fails on non integers" <|
+                \_ ->
+                    Parser.int
+                        |> Parser.parse "yolo42"
+                        |> Expect.equal (Err "expected int")
             ]
         ]
