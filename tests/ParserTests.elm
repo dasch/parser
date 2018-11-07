@@ -55,4 +55,33 @@ suite =
                         |> Parser.parse "hello world"
                         |> Expect.equal (Ok ' ')
             ]
+        , describe "zeroOrMore"
+            [ test "it succeeds if there are no matches" <|
+                \_ ->
+                    Parser.zeroOrMore (Parser.char 'x')
+                        |> Parser.parse "yyy"
+                        |> Expect.equal (Ok [])
+            , test "it matches one time" <|
+                \_ ->
+                    Parser.zeroOrMore (Parser.char 'x')
+                        |> Parser.parse "xyy"
+                        |> Expect.equal (Ok [ () ])
+            ]
+        , describe "oneOrMore"
+            [ test "it fails if there are no matches" <|
+                \_ ->
+                    Parser.oneOrMore (Parser.char 'x')
+                        |> Parser.parse "yyy"
+                        |> Expect.equal (Err "expected char")
+            , test "it matches one time" <|
+                \_ ->
+                    Parser.oneOrMore (Parser.char 'x')
+                        |> Parser.parse "xyy"
+                        |> Expect.equal (Ok [ () ])
+            , test "it matches many times" <|
+                \_ ->
+                    Parser.oneOrMore (Parser.char 'x')
+                        |> Parser.parse "xxy"
+                        |> Expect.equal (Ok [ (), () ])
+            ]
         ]

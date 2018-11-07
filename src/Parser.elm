@@ -30,6 +30,33 @@ parse input parser =
             Err err
 
 
+oneOrMore : Parser a -> Parser (List a)
+oneOrMore parser =
+    parser
+        |> andThen
+            (\val ->
+                zeroOrMore parser
+                    |> andThen (\rest -> succeed (val :: rest))
+            )
+
+
+zeroOrMore : Parser a -> Parser (List a)
+zeroOrMore parser state =
+    let
+        agg values currState =
+            if isAtEnd currState then
+                ( currState, [] )
+            else
+                case parser currState of
+                    Ok ( newState, val ) ->
+                        agg (val :: values) newState
+
+                    Err err ->
+                        ( currState, values )
+    in
+        Ok (agg [] state)
+
+
 succeed : a -> Parser a
 succeed val state =
     Ok ( state, val )
@@ -38,6 +65,11 @@ succeed val state =
 fail : String -> Parser a
 fail str state =
     Err str
+
+
+isAtEnd : State -> Bool
+isAtEnd state =
+    List.isEmpty state.remaining
 
 
 char : Char -> Parser ()
