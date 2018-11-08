@@ -18,7 +18,7 @@ parse input =
 
 value : Parser Value
 value =
-    oneOf [ int, list, string ]
+    oneOf [ int, list, dict, string ]
 
 
 int : Parser Value
@@ -31,10 +31,15 @@ int =
 
 string : Parser Value
 string =
+    rawString
+        |> map BString
+
+
+rawString : Parser String
+rawString =
     Parser.int
         |> ignoring (char ':')
         |> andThen (\length -> chomp length)
-        |> map BString
 
 
 list : Parser Value
@@ -43,6 +48,21 @@ list =
         |> ignoring (char 'l')
         |> followedBy (zeroOrMore (lazy (\_ -> value)))
         |> ignoring e
+
+
+dict : Parser Value
+dict =
+    let
+        kvPair =
+            succeed (\k v -> ( k, v ))
+                |> followedBy rawString
+                |> followedBy (lazy (\_ -> value))
+    in
+        succeed Dict.fromList
+            |> ignoring (char 'd')
+            |> followedBy (zeroOrMore kvPair)
+            |> ignoring e
+            |> map BDict
 
 
 e : Parser Char

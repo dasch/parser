@@ -1,5 +1,6 @@
 module BencodeTests exposing (..)
 
+import Dict
 import Expect exposing (Expectation)
 import Test exposing (..)
 import Examples.Bencode exposing (..)
@@ -45,5 +46,15 @@ suite =
                 \_ ->
                     parse "li42ei13ee"
                         |> Expect.equal (Ok (BList [ BInt 42, BInt 13 ]))
+            ]
+        , describe "dicts"
+            [ test "empty dict" <|
+                \_ ->
+                    parse "de"
+                        |> Expect.equal (Ok (BDict Dict.empty))
+            , test "valid dicts" <|
+                \_ ->
+                    parse "d5:helloi42e5:worldi13ee"
+                        |> Expect.equal (Ok (BDict (Dict.fromList [ ( "hello", BInt 42 ), ( "world", BInt 13 ) ])))
             ]
         ]
