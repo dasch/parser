@@ -26,4 +26,14 @@ suite =
                     parse "i4x2e"
                         |> Expect.err
             ]
+        , describe "lists"
+            [ test "empty list" <|
+                \_ ->
+                    parse "le"
+                        |> Expect.equal (Ok (BList []))
+            , test "valid lists" <|
+                \_ ->
+                    parse "li42ei13ee"
+                        |> Expect.equal (Ok (BList [ BInt 42, BInt 13 ]))
+            ]
         ]
