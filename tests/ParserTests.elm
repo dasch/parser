@@ -96,7 +96,7 @@ suite =
                 \_ ->
                     Parser.oneOrMore (Parser.char 'x')
                         |> Parser.parse "yyy"
-                        |> Expect.equal (Err "expected char")
+                        |> Expect.equal (Err "expected char x")
             , test "it matches one time" <|
                 \_ ->
                     Parser.oneOrMore (Parser.char 'x')

@@ -139,7 +139,7 @@ char chr state =
     if peek 1 state == [ chr ] then
         Ok ( advance 1 state, chr )
     else
-        Err "expected char"
+        Err ("expected char " ++ String.fromChar chr)
 
 
 string : String -> Parser String
