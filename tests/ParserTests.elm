@@ -35,6 +35,18 @@ suite =
                         |> parse "hello world"
                         |> Expect.equal (Ok "hello")
             ]
+        , describe "when"
+            [ test "succeeds when the predicate holds" <|
+                \_ ->
+                    when Char.isUpper
+                        |> parse "Hello world"
+                        |> Expect.equal (Ok 'H')
+            , test "fails when the predicate fails" <|
+                \_ ->
+                    when Char.isUpper
+                        |> parse "hello world"
+                        |> Expect.equal (Err "char h failed predicate")
+            ]
         , describe "maybe"
             [ test "succeeds with Nothing if the parser fails" <|
                 \_ ->

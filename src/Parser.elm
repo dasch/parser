@@ -202,6 +202,19 @@ chomp n =
         |> map String.fromList
 
 
+when : (Char -> Bool) -> Parser Char
+when predicate state =
+    case state.remaining of
+        chr :: _ ->
+            if predicate chr then
+                Ok ( advance 1 state, chr )
+            else
+                Err ("char " ++ String.fromChar chr ++ " failed predicate")
+
+        _ ->
+            Err "end of input"
+
+
 char : Char -> Parser Char
 char chr state =
     if peek 1 state == [ chr ] then

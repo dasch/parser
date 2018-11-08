@@ -24,6 +24,20 @@ suite =
                     parse "\"hello\""
                         |> expectValue (TomlString "hello")
             ]
+        , describe "key/value"
+            [ test "simple assignment" <|
+                \_ ->
+                    parse "hello = 42"
+                        |> expectValue (TomlKv "hello" (TomlInt 42))
+            , test "leading spaces" <|
+                \_ ->
+                    parse " \thello = 42"
+                        |> expectValue (TomlKv "hello" (TomlInt 42))
+            , test "trailing spaces" <|
+                \_ ->
+                    parse "hello = 42  \n"
+                        |> expectValue (TomlKv "hello" (TomlInt 42))
+            ]
         ]
 
 
