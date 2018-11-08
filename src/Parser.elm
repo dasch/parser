@@ -68,6 +68,15 @@ followedBy next =
         )
 
 
+ignoring : Parser a -> Parser b -> Parser b
+ignoring next =
+    andThen
+        (\b ->
+            next
+                |> andThen (\_ -> succeed b)
+        )
+
+
 zeroOrMore : Parser a -> Parser (List a)
 zeroOrMore parser state =
     let
