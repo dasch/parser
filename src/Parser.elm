@@ -95,7 +95,7 @@ zeroOrMore parser state =
                     agg (val :: values) newState
 
                 Err err ->
-                    ( currState, values )
+                    ( currState, List.reverse values )
     in
         Ok (agg [] state)
 
