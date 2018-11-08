@@ -59,6 +59,15 @@ map f parser =
         |> andThen (\x -> succeed (f x))
 
 
+followedBy : Parser a -> Parser (a -> b) -> Parser b
+followedBy next =
+    andThen
+        (\f ->
+            next
+                |> andThen (\x -> succeed (f x))
+        )
+
+
 zeroOrMore : Parser a -> Parser (List a)
 zeroOrMore parser state =
     let

@@ -108,6 +108,21 @@ suite =
                         |> Parser.parse "xxy"
                         |> Expect.equal (Ok [ 'x', 'x' ])
             ]
+        , describe "followedBy"
+            [ test "allows chaining parsers" <|
+                \_ ->
+                    Parser.succeed (\x -> Char.toUpper x)
+                        |> Parser.followedBy (Parser.char 'x')
+                        |> Parser.parse "xyz"
+                        |> Expect.equal (Ok 'X')
+            , test "allows chaining more parsers" <|
+                \_ ->
+                    Parser.succeed (\x y -> ( x, y ))
+                        |> Parser.followedBy (Parser.char 'x')
+                        |> Parser.followedBy (Parser.char 'y')
+                        |> Parser.parse "xyz"
+                        |> Expect.equal (Ok ( 'x', 'y' ))
+            ]
         , describe "int"
             [ test "it matches an integer" <|
                 \_ ->
