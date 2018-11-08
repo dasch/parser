@@ -40,6 +40,15 @@ fail str state =
     Err str
 
 
+lazy : (() -> Parser a) -> Parser a
+lazy f state =
+    let
+        parser =
+            f ()
+    in
+        parser state
+
+
 withError : String -> Parser a -> Parser a
 withError msg parser state =
     parser state
