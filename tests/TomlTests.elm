@@ -14,6 +14,16 @@ suite =
                     parse "42"
                         |> expectValue (TomlInt 42)
             ]
+        , describe "strings"
+            [ test "empty string" <|
+                \_ ->
+                    parse "\"\""
+                        |> expectValue (TomlString "")
+            , test "valid strings" <|
+                \_ ->
+                    parse "\"hello\""
+                        |> expectValue (TomlString "hello")
+            ]
         ]
 
 

@@ -15,9 +15,22 @@ parse input =
 
 value : Parser Value
 value =
-    oneOf [ int ]
+    oneOf [ int, string ]
 
 
 int : Parser Value
 int =
     map TomlInt Parser.int
+
+
+string : Parser Value
+string =
+    succeed (TomlString << String.fromList)
+        |> ignoring doubleQuote
+        |> followedBy (until doubleQuote anyChar)
+        |> ignoring doubleQuote
+
+
+doubleQuote : Parser Char
+doubleQuote =
+    char '"'

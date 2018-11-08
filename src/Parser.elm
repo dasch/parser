@@ -146,6 +146,25 @@ advance length state =
     }
 
 
+until : Parser a -> Parser b -> Parser (List b)
+until stop parser state =
+    let
+        follow =
+            parser
+                |> andThen
+                    (\x ->
+                        until stop parser
+                            |> map (\xs -> x :: xs)
+                    )
+    in
+        case stop state of
+            Ok _ ->
+                Ok ( state, [] )
+
+            Err _ ->
+                follow state
+
+
 end : Parser ()
 end state =
     if state.remaining == [] then
