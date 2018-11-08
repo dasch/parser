@@ -58,11 +58,10 @@ dict =
                 |> followedBy rawString
                 |> followedBy (lazy (\_ -> value))
     in
-        succeed Dict.fromList
+        succeed (BDict << Dict.fromList)
             |> ignoring (char 'd')
             |> followedBy (zeroOrMore kvPair)
             |> ignoring e
-            |> map BDict
 
 
 e : Parser Char
