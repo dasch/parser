@@ -38,6 +38,27 @@ suite =
                     parse "hello = 42  \n"
                         |> expectValue (TomlKv "hello" (TomlInt 42))
             ]
+        , describe "tables"
+            [ test "with no key/value pairs" <|
+                \_ ->
+                    parse "[greetings]"
+                        |> expectValue (TomlKv "greetings" (TomlTable []))
+            , test "with key/value pairs" <|
+                \_ ->
+                    parse """
+                    [greetings]
+                    hello = 42
+                    world = 13
+                    """
+                        |> expectValue
+                            (TomlKv "greetings"
+                                (TomlTable
+                                    [ TomlKv "hello" (TomlInt 42)
+                                    , TomlKv "world" (TomlInt 13)
+                                    ]
+                                )
+                            )
+            ]
         ]
 
 
