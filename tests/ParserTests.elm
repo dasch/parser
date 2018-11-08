@@ -35,6 +35,18 @@ suite =
                         |> parse "hello world"
                         |> Expect.equal (Ok "hello")
             ]
+        , describe "maybe"
+            [ test "succeeds with Nothing if the parser fails" <|
+                \_ ->
+                    maybe (char 'x')
+                        |> parse "y"
+                        |> Expect.equal (Ok Nothing)
+            , test "succeeds with Just x if the parser succeeds with x" <|
+                \_ ->
+                    maybe (char 'x')
+                        |> parse "x"
+                        |> Expect.equal (Ok (Just 'x'))
+            ]
         , describe "string"
             [ test "matches the exact characters" <|
                 \_ ->

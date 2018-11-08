@@ -62,6 +62,16 @@ andThen next parser state =
             (\( newState, val ) -> next val newState)
 
 
+orElse : Parser a -> Parser a -> Parser a
+orElse fallback parser state =
+    case parser state of
+        Err _ ->
+            fallback state
+
+        Ok ( newState, x ) ->
+            Ok ( newState, x )
+
+
 map : (a -> b) -> Parser a -> Parser b
 map f parser =
     parser
@@ -84,6 +94,13 @@ ignoring next =
             next
                 |> andThen (\_ -> succeed b)
         )
+
+
+maybe : Parser a -> Parser (Maybe a)
+maybe parser =
+    parser
+        |> map Just
+        |> orElse (succeed Nothing)
 
 
 zeroOrMore : Parser a -> Parser (List a)
