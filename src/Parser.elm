@@ -135,19 +135,9 @@ sequence parsers =
 
 
 oneOf : List (Parser a) -> Parser a
-oneOf parsers state =
-    let
-        step : Parser a -> Result String ( State, a ) -> Result String ( State, a )
-        step parser tmp =
-            case tmp of
-                Ok ( newState, val ) ->
-                    Ok ( newState, val )
-
-                Err _ ->
-                    parser state
-    in
-        List.foldl step (Err "") parsers
-            |> Result.mapError (\_ -> "expected one of the parsers to match")
+oneOf parsers =
+    List.foldl orElse (fail "") parsers
+        |> withError "expected one of the parsers to match"
 
 
 peek : Int -> State -> List Char
