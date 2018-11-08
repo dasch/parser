@@ -1,6 +1,6 @@
 module Examples.Bencode exposing (parse, Value(..))
 
-import Parser exposing (Parser, succeed, char, followedBy, ignoring, oneOf)
+import Parser exposing (..)
 import Dict exposing (Dict)
 
 
@@ -18,7 +18,7 @@ parse input =
 
 value : Parser Value
 value =
-    oneOf [ int ]
+    oneOf [ int, list ]
 
 
 int : Parser Value
@@ -26,6 +26,14 @@ int =
     succeed BInt
         |> ignoring (char 'i')
         |> followedBy Parser.int
+        |> ignoring e
+
+
+list : Parser Value
+list =
+    succeed BList
+        |> ignoring (char 'l')
+        |> followedBy (zeroOrMore (lazy (\_ -> value)))
         |> ignoring e
 
 
