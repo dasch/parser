@@ -25,10 +25,8 @@ int =
 
 string : Parser Value
 string =
-    succeed (TomlString << String.fromList)
-        |> ignoring doubleQuote
-        |> followedBy (until doubleQuote anyChar)
-        |> ignoring doubleQuote
+    between doubleQuote doubleQuote anyChar
+        |> map (TomlString << String.fromList)
 
 
 doubleQuote : Parser Char

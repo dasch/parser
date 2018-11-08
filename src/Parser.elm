@@ -165,6 +165,14 @@ until stop parser state =
                 follow state
 
 
+between : Parser a -> Parser b -> Parser c -> Parser (List c)
+between open close inner =
+    succeed identity
+        |> ignoring open
+        |> followedBy (until close inner)
+        |> ignoring close
+
+
 end : Parser ()
 end state =
     if state.remaining == [] then
