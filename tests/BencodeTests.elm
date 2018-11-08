@@ -26,6 +26,16 @@ suite =
                     parse "i4x2e"
                         |> Expect.err
             ]
+        , describe "strings"
+            [ test "valid string" <|
+                \_ ->
+                    parse "5:hello"
+                        |> Expect.equal (Ok (BString "hello"))
+            , test "empty string" <|
+                \_ ->
+                    parse "0:"
+                        |> Expect.equal (Ok (BString ""))
+            ]
         , describe "lists"
             [ test "empty list" <|
                 \_ ->

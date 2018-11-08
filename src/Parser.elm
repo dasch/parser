@@ -161,6 +161,13 @@ anyChar state =
         |> Result.fromMaybe "expected any char"
 
 
+chomp : Int -> Parser String
+chomp n =
+    List.repeat n (anyChar)
+        |> sequence
+        |> map String.fromList
+
+
 char : Char -> Parser Char
 char chr state =
     if peek 1 state == [ chr ] then

@@ -28,6 +28,13 @@ suite =
                         |> parse "hello world"
                         |> Expect.equal (Ok 'e')
             ]
+        , describe "chomp"
+            [ test "matches n chars" <|
+                \_ ->
+                    chomp 5
+                        |> parse "hello world"
+                        |> Expect.equal (Ok "hello")
+            ]
         , describe "string"
             [ test "matches the exact characters" <|
                 \_ ->

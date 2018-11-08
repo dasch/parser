@@ -18,7 +18,7 @@ parse input =
 
 value : Parser Value
 value =
-    oneOf [ int, list ]
+    oneOf [ int, list, string ]
 
 
 int : Parser Value
@@ -27,6 +27,14 @@ int =
         |> ignoring (char 'i')
         |> followedBy Parser.int
         |> ignoring e
+
+
+string : Parser Value
+string =
+    Parser.int
+        |> ignoring (char ':')
+        |> andThen (\length -> chomp length)
+        |> map BString
 
 
 list : Parser Value
