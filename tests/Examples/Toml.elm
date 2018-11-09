@@ -102,9 +102,7 @@ spaces =
 
 space : Parser Char
 space =
-    [ ' ', '\t' ]
-        |> List.map char
-        |> oneOf
+    oneOf (List.map char [ ' ', '\t' ])
 
 
 newline : Parser Char
