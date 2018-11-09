@@ -23,9 +23,9 @@ parseValue input =
 document : Parser Value
 document =
     succeed (\x y -> (TomlTable (Dict.fromList (List.append x y))))
-        |> ignoring (zeroOrMore blankLine)
+        |> ignoring blankLines
         |> grabbing (zeroOrMore keyValue)
-        |> ignoring (zeroOrMore blankLine)
+        |> ignoring blankLines
         |> grabbing (zeroOrMore table)
 
 
@@ -63,9 +63,9 @@ table =
                 |> ignoring (maybe newline)
     in
         succeed tuple
-            |> ignoring (zeroOrMore blankLine)
+            |> ignoring blankLines
             |> grabbing heading
-            |> ignoring (zeroOrMore blankLine)
+            |> ignoring blankLines
             |> grabbing keyValues
 
 
@@ -108,6 +108,12 @@ space =
 newline : Parser Char
 newline =
     char '\n'
+
+
+blankLines : Parser ()
+blankLines =
+    zeroOrMore blankLine
+        |> map (\_ -> ())
 
 
 blankLine : Parser ()
