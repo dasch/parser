@@ -1,13 +1,13 @@
-module Examples.Toml exposing (Value(..), parse)
+module Examples.Toml exposing (Value(..), parse, parseValue)
 
 import Parser exposing (..)
+import Dict exposing (Dict)
 
 
 type Value
     = TomlString String
     | TomlInt Int
-    | TomlKv String Value
-    | TomlTable (List Value)
+    | TomlTable (Dict String Value)
 
 
 parse : String -> Result String Value
@@ -15,16 +15,23 @@ parse input =
     Parser.parse input document
 
 
+parseValue : String -> Result String Value
+parseValue input =
+    Parser.parse input value
+
+
 document : Parser Value
 document =
-    succeed identity
+    succeed (\x y -> (TomlTable (Dict.fromList (List.append x y))))
         |> ignoring (zeroOrMore blankLine)
-        |> followedBy value
+        |> followedBy (zeroOrMore keyValue)
+        |> ignoring (zeroOrMore blankLine)
+        |> followedBy (zeroOrMore table)
 
 
 value : Parser Value
 value =
-    oneOf [ int, string, table, keyValue ]
+    oneOf [ int, string ]
 
 
 int : Parser Value
@@ -43,20 +50,34 @@ doubleQuote =
     char '"'
 
 
-table : Parser Value
+table : Parser ( String, Value )
 table =
-    succeed (\name values -> TomlKv name (TomlTable values))
-        |> ignoring spaces
-        |> ignoring (char '[')
-        |> followedBy key
-        |> ignoring (char ']')
-        |> ignoring (maybe newline)
+    let
+        heading : Parser String
+        heading =
+            succeed identity
+                |> ignoring spaces
+                |> ignoring (char '[')
+                |> followedBy key
+                |> ignoring (char ']')
+                |> ignoring (maybe newline)
+    in
+        succeed tuple
+            |> ignoring (zeroOrMore blankLine)
+            |> followedBy heading
+            |> ignoring (zeroOrMore blankLine)
+            |> followedBy keyValues
+
+
+keyValues : Parser Value
+keyValues =
+    succeed (TomlTable << Dict.fromList)
         |> followedBy (zeroOrMore keyValue)
 
 
-keyValue : Parser Value
+keyValue : Parser ( String, Value )
 keyValue =
-    succeed TomlKv
+    succeed tuple
         |> ignoring spaces
         |> followedBy key
         |> ignoring spaces
@@ -96,3 +117,8 @@ blankLine =
     succeed ()
         |> ignoring spaces
         |> ignoring newline
+
+
+tuple : a -> b -> ( a, b )
+tuple a b =
+    ( a, b )
