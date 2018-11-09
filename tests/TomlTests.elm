@@ -39,6 +39,16 @@ suite =
                     parse "hello = 42  \n"
                         |> expectValue (TomlTable (Dict.fromList [ ( "hello", TomlInt 42 ) ]))
             ]
+        , describe "booleans"
+            [ test "true" <|
+                \_ ->
+                    parseValue "true"
+                        |> expectValue (TomlBool True)
+            , test "false" <|
+                \_ ->
+                    parseValue "false"
+                        |> expectValue (TomlBool False)
+            ]
         , tableTests
         ]
 

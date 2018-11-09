@@ -7,6 +7,7 @@ import Dict exposing (Dict)
 type Value
     = TomlString String
     | TomlInt Int
+    | TomlBool Bool
     | TomlTable (Dict String Value)
 
 
@@ -31,7 +32,22 @@ document =
 
 value : Parser Value
 value =
-    oneOf [ int, string ]
+    oneOf [ bool, int, string ]
+
+
+bool : Parser Value
+bool =
+    let
+        true =
+            Parser.string "true"
+                |> map (\_ -> True)
+
+        false =
+            Parser.string "false"
+                |> map (\_ -> False)
+    in
+        oneOf [ true, false ]
+            |> map TomlBool
 
 
 int : Parser Value
