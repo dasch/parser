@@ -1,6 +1,7 @@
 module Examples.Bencode exposing (parse, Value(..))
 
 import Parser exposing (..)
+import Parser.Common exposing (..)
 import Dict exposing (Dict)
 
 
@@ -25,7 +26,7 @@ int : Parser Value
 int =
     succeed BInt
         |> ignoring (char 'i')
-        |> grabbing Parser.int
+        |> grabbing Parser.Common.int
         |> ignoring e
 
 
@@ -37,7 +38,7 @@ string =
 
 rawString : Parser String
 rawString =
-    Parser.int
+    Parser.Common.int
         |> ignoring (char ':')
         |> andThen (\length -> chomp length)
 

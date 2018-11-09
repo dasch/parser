@@ -1,6 +1,7 @@
 module Examples.Toml exposing (Value(..), parse, parseValue)
 
 import Parser exposing (..)
+import Parser.Common exposing (..)
 import Dict exposing (Dict)
 
 
@@ -61,7 +62,7 @@ bool =
 
 int : Parser Value
 int =
-    map TomlInt Parser.int
+    map TomlInt Parser.Common.int
 
 
 string : Parser Value
