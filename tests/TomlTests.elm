@@ -39,80 +39,84 @@ suite =
                     parse "hello = 42  \n"
                         |> expectValue (TomlTable (Dict.fromList [ ( "hello", TomlInt 42 ) ]))
             ]
-        , describe "tables"
-            [ test "with no key/value pairs" <|
-                \_ ->
-                    parse "[greetings]"
-                        |> expectValue
-                            (TomlTable
-                                (Dict.fromList
-                                    [ ( "greetings", TomlTable Dict.empty ) ]
-                                )
+        , tableTests
+        ]
+
+
+tableTests =
+    describe "tables"
+        [ test "with no key/value pairs" <|
+            \_ ->
+                parse "[greetings]"
+                    |> expectValue
+                        (TomlTable
+                            (Dict.fromList
+                                [ ( "greetings", TomlTable Dict.empty ) ]
                             )
-            , test "with key/value pairs" <|
-                \_ ->
-                    parse """
+                        )
+        , test "with key/value pairs" <|
+            \_ ->
+                parse """
                     [greetings]
                     hello = 42
                     world = 13
                     """
-                        |> expectValue
-                            (TomlTable
-                                (Dict.fromList
-                                    [ ( "greetings"
-                                      , TomlTable
-                                            (Dict.fromList
-                                                [ ( "hello", TomlInt 42 )
-                                                , ( "world", TomlInt 13 )
-                                                ]
-                                            )
-                                      )
-                                    ]
-                                )
+                    |> expectValue
+                        (TomlTable
+                            (Dict.fromList
+                                [ ( "greetings"
+                                  , TomlTable
+                                        (Dict.fromList
+                                            [ ( "hello", TomlInt 42 )
+                                            , ( "world", TomlInt 13 )
+                                            ]
+                                        )
+                                  )
+                                ]
                             )
-            , test "multiple tables" <|
-                \_ ->
-                    parse """
-                    [greetings]
-                    hello = 42
+                        )
+        , test "multiple tables" <|
+            \_ ->
+                parse """
+                            [greetings]
+                            hello = 42
 
                     [places]
                     world = 13
                     """
-                        |> expectValue
-                            (TomlTable
-                                (Dict.fromList
-                                    [ ( "greetings"
-                                      , TomlTable
-                                            (Dict.fromList [ ( "hello", TomlInt 42 ) ])
-                                      )
-                                    , ( "places"
-                                      , TomlTable
-                                            (Dict.fromList [ ( "world", TomlInt 13 ) ])
-                                      )
-                                    ]
-                                )
+                    |> expectValue
+                        (TomlTable
+                            (Dict.fromList
+                                [ ( "greetings"
+                                  , TomlTable
+                                        (Dict.fromList [ ( "hello", TomlInt 42 ) ])
+                                  )
+                                , ( "places"
+                                  , TomlTable
+                                        (Dict.fromList [ ( "world", TomlInt 13 ) ])
+                                  )
+                                ]
                             )
-            , test "with leading key/value pairs" <|
-                \_ ->
-                    parse """
-                    hello = 42
+                        )
+        , test "with leading key/value pairs" <|
+            \_ ->
+                parse """
+                            hello = 42
 
                     [places]
                     world = 13
                     """
-                        |> expectValue
-                            (TomlTable
-                                (Dict.fromList
-                                    [ ( "hello", TomlInt 42 )
-                                    , ( "places"
-                                      , TomlTable
-                                            (Dict.fromList [ ( "world", TomlInt 13 ) ])
-                                      )
-                                    ]
-                                )
+                    |> expectValue
+                        (TomlTable
+                            (Dict.fromList
+                                [ ( "hello", TomlInt 42 )
+                                , ( "places"
+                                  , TomlTable
+                                        (Dict.fromList [ ( "world", TomlInt 13 ) ])
+                                  )
+                                ]
                             )
-            ]
+                        )
         ]
 
 
