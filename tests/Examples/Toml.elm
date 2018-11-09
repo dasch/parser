@@ -8,6 +8,7 @@ type Value
     = TomlString String
     | TomlInt Int
     | TomlBool Bool
+    | TomlArray (List Value)
     | TomlTable (Dict String Value)
 
 
@@ -32,7 +33,15 @@ document =
 
 value : Parser Value
 value =
-    oneOf [ bool, int, string ]
+    oneOf [ bool, int, string, array ]
+
+
+paddedValue : Parser Value
+paddedValue =
+    succeed identity
+        |> ignoring spaces
+        |> grabbing (lazy (\_ -> value))
+        |> ignoring spaces
 
 
 bool : Parser Value
@@ -64,6 +73,18 @@ string =
 doubleQuote : Parser Char
 doubleQuote =
     char '"'
+
+
+array : Parser Value
+array =
+    let
+        elements =
+            zeroOrMore int
+    in
+        succeed TomlArray
+            |> ignoring (char '[')
+            |> grabbing (separatedBy (char ',') paddedValue)
+            |> ignoring (char ']')
 
 
 table : Parser ( String, Value )

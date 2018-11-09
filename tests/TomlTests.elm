@@ -50,6 +50,20 @@ suite =
                         |> expectValue (TomlBool False)
             ]
         , tableTests
+        , describe "arrays"
+            [ test "empty array" <|
+                \_ ->
+                    parseValue "[]"
+                        |> expectValue (TomlArray [])
+            , test "one element array" <|
+                \_ ->
+                    parseValue "[42]"
+                        |> expectValue (TomlArray [ TomlInt 42 ])
+            , test "multi element array" <|
+                \_ ->
+                    parseValue "[ 42 , 13 ]"
+                        |> expectValue (TomlArray [ TomlInt 42, TomlInt 13 ])
+            ]
         ]
 
 

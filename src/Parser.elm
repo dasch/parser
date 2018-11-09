@@ -180,6 +180,25 @@ between open close inner =
         |> ignoring close
 
 
+separatedBy : Parser s -> Parser a -> Parser (List a)
+separatedBy separator parser =
+    let
+        empty =
+            succeed []
+
+        oneElement =
+            parser
+                |> map (List.singleton)
+
+        multipleElements =
+            succeed (::)
+                |> grabbing parser
+                |> ignoring separator
+                |> grabbing (lazy (\_ -> separatedBy separator parser))
+    in
+        oneOf [ multipleElements, oneElement, empty ]
+
+
 end : Parser ()
 end state =
     if state.remaining == [] then

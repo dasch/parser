@@ -170,4 +170,26 @@ suite =
                         |> parse "yolo42"
                         |> Expect.equal (Err "expected int")
             ]
+        , describe "separatedBy"
+            [ test "matches elements separated by the separator" <|
+                \_ ->
+                    separatedBy (char ',') (char 'x')
+                        |> parse "x,x,x"
+                        |> Expect.equal (Ok [ 'x', 'x', 'x' ])
+            , test "matches a single element" <|
+                \_ ->
+                    separatedBy (char ',') (char 'x')
+                        |> parse "xyz"
+                        |> Expect.equal (Ok [ 'x' ])
+            , test "succeeds even if no elements match" <|
+                \_ ->
+                    separatedBy (char ',') (char 'x')
+                        |> parse "yz"
+                        |> Expect.equal (Ok [])
+            , test "stops when the element after the separator doesn't match" <|
+                \_ ->
+                    separatedBy (char ',') (char 'x')
+                        |> parse "x,x,y"
+                        |> Expect.equal (Ok [ 'x', 'x' ])
+            ]
         ]
