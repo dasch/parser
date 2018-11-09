@@ -90,8 +90,8 @@ keyValue =
 
 key : Parser String
 key =
-    succeed String.fromList
-        |> grabbing (oneOrMore (when Char.isAlphaNum))
+    oneOrMore (when Char.isAlphaNum)
+        |> map String.fromList
 
 
 spaces : Parser String
