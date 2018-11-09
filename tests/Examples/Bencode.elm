@@ -25,7 +25,7 @@ int : Parser Value
 int =
     succeed BInt
         |> ignoring (char 'i')
-        |> followedBy Parser.int
+        |> grabbing Parser.int
         |> ignoring e
 
 
@@ -46,7 +46,7 @@ list : Parser Value
 list =
     succeed BList
         |> ignoring (char 'l')
-        |> followedBy (zeroOrMore (lazy (\_ -> value)))
+        |> grabbing (zeroOrMore (lazy (\_ -> value)))
         |> ignoring e
 
 
@@ -55,12 +55,12 @@ dict =
     let
         kvPair =
             succeed (\k v -> ( k, v ))
-                |> followedBy rawString
-                |> followedBy (lazy (\_ -> value))
+                |> grabbing rawString
+                |> grabbing (lazy (\_ -> value))
     in
         succeed (BDict << Dict.fromList)
             |> ignoring (char 'd')
-            |> followedBy (zeroOrMore kvPair)
+            |> grabbing (zeroOrMore kvPair)
             |> ignoring e
 
 

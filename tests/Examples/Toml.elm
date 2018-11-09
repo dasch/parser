@@ -24,9 +24,9 @@ document : Parser Value
 document =
     succeed (\x y -> (TomlTable (Dict.fromList (List.append x y))))
         |> ignoring (zeroOrMore blankLine)
-        |> followedBy (zeroOrMore keyValue)
+        |> grabbing (zeroOrMore keyValue)
         |> ignoring (zeroOrMore blankLine)
-        |> followedBy (zeroOrMore table)
+        |> grabbing (zeroOrMore table)
 
 
 value : Parser Value
@@ -58,32 +58,32 @@ table =
             succeed identity
                 |> ignoring spaces
                 |> ignoring (char '[')
-                |> followedBy key
+                |> grabbing key
                 |> ignoring (char ']')
                 |> ignoring (maybe newline)
     in
         succeed tuple
             |> ignoring (zeroOrMore blankLine)
-            |> followedBy heading
+            |> grabbing heading
             |> ignoring (zeroOrMore blankLine)
-            |> followedBy keyValues
+            |> grabbing keyValues
 
 
 keyValues : Parser Value
 keyValues =
     succeed (TomlTable << Dict.fromList)
-        |> followedBy (zeroOrMore keyValue)
+        |> grabbing (zeroOrMore keyValue)
 
 
 keyValue : Parser ( String, Value )
 keyValue =
     succeed tuple
         |> ignoring spaces
-        |> followedBy key
+        |> grabbing key
         |> ignoring spaces
         |> ignoring (char '=')
         |> ignoring spaces
-        |> followedBy (lazy (\_ -> value))
+        |> grabbing (lazy (\_ -> value))
         |> ignoring spaces
         |> ignoring (maybe newline)
 
@@ -91,7 +91,7 @@ keyValue =
 key : Parser String
 key =
     succeed String.fromList
-        |> followedBy (oneOrMore (when Char.isAlphaNum))
+        |> grabbing (oneOrMore (when Char.isAlphaNum))
 
 
 spaces : Parser String

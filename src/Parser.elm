@@ -78,8 +78,8 @@ map f parser =
         |> andThen (\x -> succeed (f x))
 
 
-followedBy : Parser a -> Parser (a -> b) -> Parser b
-followedBy next =
+grabbing : Parser a -> Parser (a -> b) -> Parser b
+grabbing next =
     andThen
         (\f ->
             next
@@ -176,7 +176,7 @@ between : Parser a -> Parser b -> Parser c -> Parser (List c)
 between open close inner =
     succeed identity
         |> ignoring open
-        |> followedBy (until close inner)
+        |> grabbing (until close inner)
         |> ignoring close
 
 
