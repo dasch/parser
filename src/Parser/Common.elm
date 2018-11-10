@@ -6,10 +6,6 @@ import Parser exposing (..)
 int : Parser Int
 int =
     let
-        digit : Parser Char
-        digit =
-            oneOf (List.map char [ '0', '1', '2', '3', '4', '5', '6', '7', '8', '9' ])
-
         parseInt : List Char -> State -> Result String ( State, Int )
         parseInt digits newState =
             String.fromList digits
@@ -41,6 +37,11 @@ alpha =
 alphaNum : Parser Char
 alphaNum =
     when Char.isAlphaNum
+
+
+digit : Parser Char
+digit =
+    when Char.isDigit
 
 
 space : Parser Char
