@@ -44,6 +44,16 @@ digit =
     when Char.isDigit
 
 
+upper : Parser Char
+upper =
+    when Char.isUpper
+
+
+lower : Parser Char
+lower =
+    when Char.isLower
+
+
 space : Parser Char
 space =
     char ' '
