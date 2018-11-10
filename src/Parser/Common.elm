@@ -20,3 +20,28 @@ int =
         oneOrMore digit
             |> andThen (\digits -> parseInt digits)
             |> withError "expected int"
+
+
+space : Parser Char
+space =
+    char ' '
+
+
+tab : Parser Char
+tab =
+    char '\t'
+
+
+blank : Parser Char
+blank =
+    oneOf [ space, tab ]
+
+
+blanks : Parser String
+blanks =
+    map String.fromList (zeroOrMore blank)
+
+
+newline : Parser Char
+newline =
+    char '\n'

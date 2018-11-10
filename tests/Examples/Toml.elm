@@ -40,9 +40,9 @@ value =
 paddedValue : Parser Value
 paddedValue =
     succeed identity
-        |> ignoring spaces
+        |> ignoring blanks
         |> grabbing (lazy (\_ -> value))
-        |> ignoring spaces
+        |> ignoring blanks
 
 
 bool : Parser Value
@@ -94,7 +94,7 @@ table =
         heading : Parser String
         heading =
             succeed identity
-                |> ignoring spaces
+                |> ignoring blanks
                 |> ignoring (char '[')
                 |> grabbing key
                 |> ignoring (char ']')
@@ -116,13 +116,13 @@ keyValues =
 keyValue : Parser ( String, Value )
 keyValue =
     succeed tuple
-        |> ignoring spaces
+        |> ignoring blanks
         |> grabbing key
-        |> ignoring spaces
+        |> ignoring blanks
         |> ignoring (char '=')
-        |> ignoring spaces
+        |> ignoring blanks
         |> grabbing (lazy (\_ -> value))
-        |> ignoring spaces
+        |> ignoring blanks
         |> ignoring (maybe newline)
 
 
@@ -130,22 +130,6 @@ key : Parser String
 key =
     oneOrMore (when Char.isAlphaNum)
         |> map String.fromList
-
-
-spaces : Parser String
-spaces =
-    zeroOrMore space
-        |> map String.fromList
-
-
-space : Parser Char
-space =
-    oneOf (List.map char [ ' ', '\t' ])
-
-
-newline : Parser Char
-newline =
-    char '\n'
 
 
 blankLines : Parser ()
@@ -157,7 +141,7 @@ blankLines =
 blankLine : Parser ()
 blankLine =
     succeed ()
-        |> ignoring spaces
+        |> ignoring blanks
         |> ignoring newline
 
 
