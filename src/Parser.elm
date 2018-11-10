@@ -214,6 +214,11 @@ anyChar state =
         |> Result.fromMaybe "expected any char"
 
 
+anyCharExcept : Char -> Parser Char
+anyCharExcept chr =
+    when (\c -> c /= chr)
+
+
 chomp : Int -> Parser String
 chomp n =
     List.repeat n (anyChar)
