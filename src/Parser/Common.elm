@@ -22,6 +22,27 @@ int =
             |> withError "expected int"
 
 
+word : Parser String
+word =
+    let
+        wordChar =
+            oneOf [ alphaNum, char '_' ]
+    in
+        oneOrMore wordChar
+            |> map String.fromList
+            |> withError "expected word"
+
+
+alpha : Parser Char
+alpha =
+    when Char.isAlpha
+
+
+alphaNum : Parser Char
+alphaNum =
+    when Char.isAlphaNum
+
+
 space : Parser Char
 space =
     char ' '

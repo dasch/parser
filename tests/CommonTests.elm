@@ -21,6 +21,23 @@ suite =
                         |> parse "yolo42"
                         |> Expect.equal (Err "expected int")
             ]
+        , describe "word"
+            [ test "matches start with an alpha char" <|
+                \_ ->
+                    word
+                        |> parse "xy123"
+                        |> Expect.equal (Ok "xy123")
+            , test "matches underscores" <|
+                \_ ->
+                    word
+                        |> parse "xy123"
+                        |> Expect.equal (Ok "xy123")
+            , test "fails on non-word char" <|
+                \_ ->
+                    word
+                        |> parse "%hello"
+                        |> Expect.equal (Err "expected word")
+            ]
         , describe "space"
             [ test "matches a space" <|
                 \_ ->
