@@ -239,6 +239,16 @@ when predicate state =
             Err "end of input"
 
 
+except : Parser Char -> Parser Char
+except parser state =
+    case parser state of
+        Ok _ ->
+            Err "expected to not match"
+
+        Err _ ->
+            anyChar state
+
+
 char : Char -> Parser Char
 char chr state =
     if peek 1 state == [ chr ] then

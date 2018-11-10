@@ -180,4 +180,16 @@ suite =
                         |> parse "x,x,y"
                         |> Expect.equal (Ok [ 'x', 'x' ])
             ]
+        , describe "except"
+            [ test "does not match if that argument succeeds" <|
+                \_ ->
+                    except (char 'x')
+                        |> parse "xyz"
+                        |> Expect.equal (Err "expected to not match")
+            , test "matches any char if the argument fails" <|
+                \_ ->
+                    except (char 'x')
+                        |> parse "yz"
+                        |> Expect.equal (Ok 'y')
+            ]
         ]
