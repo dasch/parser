@@ -87,8 +87,8 @@ grabbing next =
         )
 
 
-ignoring : Parser a -> Parser b -> Parser b
-ignoring next =
+ignore : Parser a -> Parser b -> Parser b
+ignore next =
     andThen
         (\b ->
             next
@@ -175,9 +175,9 @@ until stop parser state =
 between : Parser a -> Parser b -> Parser c -> Parser (List c)
 between open close inner =
     succeed identity
-        |> ignoring open
+        |> ignore open
         |> grabbing (until close inner)
-        |> ignoring close
+        |> ignore close
 
 
 separatedBy : Parser s -> Parser a -> Parser (List a)
@@ -193,7 +193,7 @@ separatedBy separator parser =
         multipleElements =
             succeed (::)
                 |> grabbing parser
-                |> ignoring separator
+                |> ignore separator
                 |> grabbing (lazy (\_ -> separatedBy separator parser))
     in
         oneOf [ multipleElements, oneElement, empty ]

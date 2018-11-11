@@ -24,7 +24,7 @@ parse input =
 document : Parser Document
 document =
     separatedBy (oneOrMore emptyLine) block
-        |> ignoring end
+        |> ignore end
 
 
 block : Parser Block

@@ -1,7 +1,7 @@
 module ParserTests exposing (..)
 
 import Expect exposing (Expectation)
-import Test exposing (..)
+import Test exposing (Test, describe, test)
 import Parser exposing (..)
 
 
@@ -148,12 +148,12 @@ suite =
                         |> parse "xyz"
                         |> Expect.equal (Ok ( 'x', 'y' ))
             ]
-        , describe "ignoring"
-            [ test "allows ignoring parsers in chains" <|
+        , describe "ignore"
+            [ test "allows ignore parsers in chains" <|
                 \_ ->
                     succeed (\x y -> ( x, y ))
                         |> grabbing (char 'x')
-                        |> ignoring (char 'y')
+                        |> ignore (char 'y')
                         |> grabbing (char 'z')
                         |> parse "xyz"
                         |> Expect.equal (Ok ( 'x', 'z' ))

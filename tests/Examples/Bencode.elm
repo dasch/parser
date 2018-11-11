@@ -25,9 +25,9 @@ value =
 int : Parser Value
 int =
     succeed BInt
-        |> ignoring (char 'i')
+        |> ignore (char 'i')
         |> grabbing Parser.Common.int
-        |> ignoring e
+        |> ignore e
 
 
 string : Parser Value
@@ -39,16 +39,16 @@ string =
 rawString : Parser String
 rawString =
     Parser.Common.int
-        |> ignoring (char ':')
+        |> ignore (char ':')
         |> andThen (\length -> chomp length)
 
 
 list : Parser Value
 list =
     succeed BList
-        |> ignoring (char 'l')
+        |> ignore (char 'l')
         |> grabbing (zeroOrMore (lazy (\_ -> value)))
-        |> ignoring e
+        |> ignore e
 
 
 dict : Parser Value
@@ -60,9 +60,9 @@ dict =
                 |> grabbing (lazy (\_ -> value))
     in
         succeed (BDict << Dict.fromList)
-            |> ignoring (char 'd')
+            |> ignore (char 'd')
             |> grabbing (zeroOrMore kvPair)
-            |> ignoring e
+            |> ignore e
 
 
 e : Parser Char

@@ -26,9 +26,9 @@ parseValue input =
 document : Parser Value
 document =
     succeed (\x y -> (TomlTable (Dict.fromList (List.append x y))))
-        |> ignoring blankLines
+        |> ignore blankLines
         |> grabbing (zeroOrMore keyValue)
-        |> ignoring blankLines
+        |> ignore blankLines
         |> grabbing (zeroOrMore table)
 
 
@@ -40,9 +40,9 @@ value =
 paddedValue : Parser Value
 paddedValue =
     succeed identity
-        |> ignoring blanks
+        |> ignore blanks
         |> grabbing (lazy (\_ -> value))
-        |> ignoring blanks
+        |> ignore blanks
 
 
 bool : Parser Value
@@ -83,9 +83,9 @@ array =
             zeroOrMore int
     in
         succeed TomlArray
-            |> ignoring (char '[')
+            |> ignore (char '[')
             |> grabbing (separatedBy (char ',') paddedValue)
-            |> ignoring (char ']')
+            |> ignore (char ']')
 
 
 table : Parser ( String, Value )
@@ -94,16 +94,16 @@ table =
         heading : Parser String
         heading =
             succeed identity
-                |> ignoring blanks
-                |> ignoring (char '[')
+                |> ignore blanks
+                |> ignore (char '[')
                 |> grabbing key
-                |> ignoring (char ']')
-                |> ignoring (maybe newline)
+                |> ignore (char ']')
+                |> ignore (maybe newline)
     in
         succeed tuple
-            |> ignoring blankLines
+            |> ignore blankLines
             |> grabbing heading
-            |> ignoring blankLines
+            |> ignore blankLines
             |> grabbing keyValues
 
 
@@ -116,14 +116,14 @@ keyValues =
 keyValue : Parser ( String, Value )
 keyValue =
     succeed tuple
-        |> ignoring blanks
+        |> ignore blanks
         |> grabbing key
-        |> ignoring blanks
-        |> ignoring (char '=')
-        |> ignoring blanks
+        |> ignore blanks
+        |> ignore (char '=')
+        |> ignore blanks
         |> grabbing (lazy (\_ -> value))
-        |> ignoring blanks
-        |> ignoring (maybe newline)
+        |> ignore blanks
+        |> ignore (maybe newline)
 
 
 key : Parser String
@@ -141,8 +141,8 @@ blankLines =
 blankLine : Parser ()
 blankLine =
     succeed ()
-        |> ignoring blanks
-        |> ignoring newline
+        |> ignore blanks
+        |> ignore newline
 
 
 tuple : a -> b -> ( a, b )
