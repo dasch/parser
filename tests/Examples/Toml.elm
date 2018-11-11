@@ -16,11 +16,13 @@ type Value
 parse : String -> Result String Value
 parse input =
     Parser.parse input document
+        |> Result.mapError .message
 
 
 parseValue : String -> Result String Value
 parseValue input =
     Parser.parse input value
+        |> Result.mapError .message
 
 
 document : Parser Value

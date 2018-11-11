@@ -2,12 +2,18 @@ module Parser exposing (..)
 
 
 type alias Parser a =
-    State -> Result String ( State, a )
+    State -> Result Error ( State, a )
 
 
 type alias State =
     { input : String
     , remaining : List Char
+    , position : Int
+    }
+
+
+type alias Error =
+    { message : String
     , position : Int
     }
 
@@ -20,7 +26,7 @@ init input =
     }
 
 
-parse : String -> Parser a -> Result String a
+parse : String -> Parser a -> Result Error a
 parse input parser =
     case parser (init input) of
         Ok ( state, value ) ->
@@ -37,7 +43,7 @@ succeed val state =
 
 fail : String -> Parser a
 fail str state =
-    Err str
+    Err { message = str, position = state.position }
 
 
 lazy : (() -> Parser a) -> Parser a
@@ -52,7 +58,7 @@ lazy f state =
 withError : String -> Parser a -> Parser a
 withError msg parser state =
     parser state
-        |> Result.mapError (\_ -> msg)
+        |> Result.mapError (\err -> { err | message = msg })
 
 
 andThen : (a -> Parser b) -> Parser a -> Parser b
@@ -215,14 +221,14 @@ end state =
     if state.remaining == [] then
         Ok ( state, () )
     else
-        Err "expected end"
+        fail "expected end" state
 
 
 anyChar : Parser Char
 anyChar state =
     List.head state.remaining
         |> Maybe.map (\chr -> ( advance 1 state, chr ))
-        |> Result.fromMaybe "expected any char"
+        |> Result.fromMaybe { message = "expected any char", position = state.position }
 
 
 anyCharExcept : Char -> Parser Char
@@ -249,17 +255,17 @@ when predicate state =
             if predicate chr then
                 Ok ( advance 1 state, chr )
             else
-                Err ("char " ++ String.fromChar chr ++ " failed predicate")
+                fail ("char " ++ String.fromChar chr ++ " failed predicate") state
 
         _ ->
-            Err "end of input"
+            fail "end of input" state
 
 
 except : Parser Char -> Parser Char
 except parser state =
     case parser state of
         Ok _ ->
-            Err "expected to not match"
+            fail "expected to not match" state
 
         Err _ ->
             anyChar state
@@ -270,7 +276,7 @@ char chr state =
     if peek 1 state == [ chr ] then
         Ok ( advance 1 state, chr )
     else
-        Err ("expected char " ++ String.fromChar chr)
+        fail ("expected char " ++ String.fromChar chr) state
 
 
 string : String -> Parser String

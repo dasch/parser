@@ -6,11 +6,11 @@ import Parser exposing (..)
 int : Parser Int
 int =
     let
-        parseInt : List Char -> State -> Result String ( State, Int )
+        parseInt : List Char -> State -> Result Error ( State, Int )
         parseInt digits newState =
             String.fromList digits
                 |> String.toInt
-                |> Result.fromMaybe "invalid int"
+                |> Result.fromMaybe (Error "invalid int" newState.position)
                 |> Result.map (\x -> ( newState, x ))
     in
         oneOrMore digit

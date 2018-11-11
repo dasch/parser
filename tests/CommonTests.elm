@@ -19,7 +19,7 @@ suite =
                 \_ ->
                     int
                         |> parse "yolo42"
-                        |> Expect.equal (Err "expected int")
+                        |> Expect.equal (Err { message = "expected int", position = 0 })
             ]
         , describe "word"
             [ test "matches start with an alpha char" <|
@@ -36,7 +36,7 @@ suite =
                 \_ ->
                     word
                         |> parse "%hello"
-                        |> Expect.equal (Err "expected word")
+                        |> Expect.equal (Err { message = "expected word", position = 0 })
             ]
         , describe "space"
             [ test "matches a space" <|

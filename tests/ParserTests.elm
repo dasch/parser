@@ -45,7 +45,7 @@ suite =
                 \_ ->
                     when Char.isUpper
                         |> parse "hello world"
-                        |> Expect.equal (Err "char h failed predicate")
+                        |> Expect.equal (Err { message = "char h failed predicate", position = 0 })
             ]
         , describe "maybe"
             [ test "succeeds with Nothing if the parser fails" <|
@@ -83,7 +83,7 @@ suite =
                 \_ ->
                     end
                         |> parse "hello"
-                        |> Expect.equal (Err "expected end")
+                        |> Expect.equal (Err { message = "expected end", position = 0 })
             ]
         , describe "oneOf"
             [ test "it can pick the first choice" <|
@@ -103,7 +103,7 @@ suite =
                     oneOf [ string "goodbye", string "hello" ]
                         |> andThen (\_ -> anyChar)
                         |> parse "yolo"
-                        |> Expect.equal (Err "expected one of the parsers to match")
+                        |> Expect.equal (Err { message = "expected one of the parsers to match", position = 0 })
             ]
         , describe "zeroOrMore"
             [ test "it succeeds if there are no matches" <|
@@ -127,7 +127,7 @@ suite =
                 \_ ->
                     oneOrMore (char 'x')
                         |> parse "yyy"
-                        |> Expect.equal (Err "expected char x")
+                        |> Expect.equal (Err { message = "expected char x", position = 0 })
             , test "it matches one time" <|
                 \_ ->
                     oneOrMore (char 'x')
@@ -185,7 +185,7 @@ suite =
                 \_ ->
                     except (char 'x')
                         |> parse "xyz"
-                        |> Expect.equal (Err "expected to not match")
+                        |> Expect.equal (Err { message = "expected to not match", position = 0 })
             , test "matches any char if the argument fails" <|
                 \_ ->
                     except (char 'x')

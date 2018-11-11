@@ -16,7 +16,7 @@ type Inline
     = Text String
 
 
-parse : String -> Result String Document
+parse : String -> Result Error Document
 parse input =
     Parser.parse input document
 

@@ -15,6 +15,7 @@ type Value
 parse : String -> Result String Value
 parse input =
     Parser.parse input value
+        |> Result.mapError .message
 
 
 value : Parser Value

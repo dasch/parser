@@ -14,7 +14,7 @@ type alias Url =
     }
 
 
-parse : String -> Result String Url
+parse : String -> Result Error Url
 parse input =
     Parser.parse input url
 
