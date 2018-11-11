@@ -117,3 +117,13 @@ fragment =
 ```
 
 We match the character `#` followed by a string with zero or more of any character until the end of the parsed string.
+
+Now we have a parser that matches most valid URLs, but how do we run it? Here's how:
+
+```elm
+parsedUrl : Result String Url
+parsedUrl =
+    Parser.parse "https://hello.com:123/greetings?recipient=world#message" url
+```
+
+`parse` takes an input string and a parser of type `Parse a` and returns a `Result String a`, with the `String` containing the error type.
