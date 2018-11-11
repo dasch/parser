@@ -62,6 +62,12 @@ andThen next parser state =
             (\( newState, val ) -> next val newState)
 
 
+followedBy : Parser a -> Parser b -> Parser a
+followedBy kept ignored =
+    ignored
+        |> andThen (\_ -> kept)
+
+
 orElse : Parser a -> Parser a -> Parser a
 orElse fallback parser state =
     case parser state of
