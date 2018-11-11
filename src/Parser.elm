@@ -78,6 +78,11 @@ map f parser =
         |> andThen (\x -> succeed (f x))
 
 
+into : (a -> b) -> Parser (a -> b)
+into =
+    succeed
+
+
 grab : Parser a -> Parser (a -> b) -> Parser b
 grab next =
     andThen

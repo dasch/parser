@@ -25,7 +25,7 @@ parseValue input =
 
 document : Parser Value
 document =
-    succeed (\x y -> (TomlTable (Dict.fromList (List.append x y))))
+    into (\x y -> (TomlTable (Dict.fromList (List.append x y))))
         |> ignore blankLines
         |> grab (zeroOrMore keyValue)
         |> ignore blankLines
@@ -39,7 +39,7 @@ value =
 
 paddedValue : Parser Value
 paddedValue =
-    succeed identity
+    into identity
         |> ignore blanks
         |> grab (lazy (\_ -> value))
         |> ignore blanks
@@ -82,7 +82,7 @@ array =
         elements =
             zeroOrMore int
     in
-        succeed TomlArray
+        into TomlArray
             |> ignore (char '[')
             |> grab (separatedBy (char ',') paddedValue)
             |> ignore (char ']')
@@ -93,14 +93,14 @@ table =
     let
         heading : Parser String
         heading =
-            succeed identity
+            into identity
                 |> ignore blanks
                 |> ignore (char '[')
                 |> grab key
                 |> ignore (char ']')
                 |> ignore (maybe newline)
     in
-        succeed tuple
+        into tuple
             |> ignore blankLines
             |> grab heading
             |> ignore blankLines
@@ -109,13 +109,13 @@ table =
 
 keyValues : Parser Value
 keyValues =
-    succeed (TomlTable << Dict.fromList)
+    into (TomlTable << Dict.fromList)
         |> grab (zeroOrMore keyValue)
 
 
 keyValue : Parser ( String, Value )
 keyValue =
-    succeed tuple
+    into tuple
         |> ignore blanks
         |> grab key
         |> ignore blanks
