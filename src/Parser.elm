@@ -230,6 +230,11 @@ anyCharExcept chr =
     when (\c -> c /= chr)
 
 
+stringWith : Parser (List Char) -> Parser String
+stringWith =
+    map String.fromList
+
+
 chomp : Int -> Parser String
 chomp n =
     List.repeat n (anyChar)
