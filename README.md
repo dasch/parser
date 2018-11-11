@@ -60,7 +60,7 @@ There's already a lot of functionality here:
 * We're buiding a `Url`, and the `into` function starts a pipeline that allows for that. Any function can be used here as long as its arguments match the following `grab` lines.
 * The `|>` (pipe) operator is used to feed values into the `Url` constructor.
 * Each pipeline element can either `grab` or `ignore` the value returned by a parser.
-* The `string` function allows creating a parser that matches an exact string).
+* The `string` function allows creating a parser that matches an exact string.
 * The `maybe` function allows _maybe_ matching a parser, meaning that the matching is optional and will succeed with `Nothing` if there's no match.
 
 Now let's define each individual component. All of them are `Parser String`, so they'll succeed with a `String` value.
