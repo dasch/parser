@@ -27,9 +27,9 @@ document : Parser Value
 document =
     succeed (\x y -> (TomlTable (Dict.fromList (List.append x y))))
         |> ignore blankLines
-        |> grabbing (zeroOrMore keyValue)
+        |> grab (zeroOrMore keyValue)
         |> ignore blankLines
-        |> grabbing (zeroOrMore table)
+        |> grab (zeroOrMore table)
 
 
 value : Parser Value
@@ -41,7 +41,7 @@ paddedValue : Parser Value
 paddedValue =
     succeed identity
         |> ignore blanks
-        |> grabbing (lazy (\_ -> value))
+        |> grab (lazy (\_ -> value))
         |> ignore blanks
 
 
@@ -84,7 +84,7 @@ array =
     in
         succeed TomlArray
             |> ignore (char '[')
-            |> grabbing (separatedBy (char ',') paddedValue)
+            |> grab (separatedBy (char ',') paddedValue)
             |> ignore (char ']')
 
 
@@ -96,32 +96,32 @@ table =
             succeed identity
                 |> ignore blanks
                 |> ignore (char '[')
-                |> grabbing key
+                |> grab key
                 |> ignore (char ']')
                 |> ignore (maybe newline)
     in
         succeed tuple
             |> ignore blankLines
-            |> grabbing heading
+            |> grab heading
             |> ignore blankLines
-            |> grabbing keyValues
+            |> grab keyValues
 
 
 keyValues : Parser Value
 keyValues =
     succeed (TomlTable << Dict.fromList)
-        |> grabbing (zeroOrMore keyValue)
+        |> grab (zeroOrMore keyValue)
 
 
 keyValue : Parser ( String, Value )
 keyValue =
     succeed tuple
         |> ignore blanks
-        |> grabbing key
+        |> grab key
         |> ignore blanks
         |> ignore (char '=')
         |> ignore blanks
-        |> grabbing (lazy (\_ -> value))
+        |> grab (lazy (\_ -> value))
         |> ignore blanks
         |> ignore (maybe newline)
 

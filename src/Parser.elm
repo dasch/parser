@@ -78,8 +78,8 @@ map f parser =
         |> andThen (\x -> succeed (f x))
 
 
-grabbing : Parser a -> Parser (a -> b) -> Parser b
-grabbing next =
+grab : Parser a -> Parser (a -> b) -> Parser b
+grab next =
     andThen
         (\f ->
             next
@@ -176,7 +176,7 @@ between : Parser a -> Parser b -> Parser c -> Parser (List c)
 between open close inner =
     succeed identity
         |> ignore open
-        |> grabbing (until close inner)
+        |> grab (until close inner)
         |> ignore close
 
 
@@ -192,9 +192,9 @@ separatedBy separator parser =
 
         multipleElements =
             succeed (::)
-                |> grabbing parser
+                |> grab parser
                 |> ignore separator
-                |> grabbing (lazy (\_ -> separatedBy separator parser))
+                |> grab (lazy (\_ -> separatedBy separator parser))
     in
         oneOf [ multipleElements, oneElement, empty ]
 

@@ -139,12 +139,12 @@ suite =
                         |> parse "xxy"
                         |> Expect.equal (Ok [ 'x', 'x' ])
             ]
-        , describe "grabbing"
+        , describe "grab"
             [ test "allows chaining more parsers" <|
                 \_ ->
                     succeed (\x y -> ( x, y ))
-                        |> grabbing (char 'x')
-                        |> grabbing (char 'y')
+                        |> grab (char 'x')
+                        |> grab (char 'y')
                         |> parse "xyz"
                         |> Expect.equal (Ok ( 'x', 'y' ))
             ]
@@ -152,9 +152,9 @@ suite =
             [ test "allows ignore parsers in chains" <|
                 \_ ->
                     succeed (\x y -> ( x, y ))
-                        |> grabbing (char 'x')
+                        |> grab (char 'x')
                         |> ignore (char 'y')
-                        |> grabbing (char 'z')
+                        |> grab (char 'z')
                         |> parse "xyz"
                         |> Expect.equal (Ok ( 'x', 'z' ))
             ]
