@@ -116,16 +116,50 @@ parse input parser =
         |> Result.map (\( _, value ) -> value)
 
 
+{-| A parser that always succeeds with a specified value without reading any input.
+
+    parse "xyz" (succeed 42) -- Ok 42
+-}
 succeed : a -> Parser a
 succeed val state =
     Ok ( state, val )
 
 
+{-| A parser that always fails with a specified error message without reading any
+input.
+
+    parse "xyz" (fail "nope") -- Err { message = "nope", position = 0 }
+-}
 fail : String -> Parser a
 fail str state =
     Err { message = str, position = state.position }
 
 
+{-| In order to support self-referential parsers, you need to introduce lazy
+evaluation.
+
+    type Tree = Leaf | Node Tree Tree
+
+    tree : Parser Tree
+    tree =
+        oneOf [ leaf, node ]
+
+    leaf : Parser Tree
+    leaf =
+        char 'x'
+
+    node : Parser Tree
+    node =
+        into Node
+            |> ignore (char '@')
+            |> grab (lazy (\_ -> tree)
+            |> grab (lazy (\_ -> tree)
+
+    parse "x" tree -- Ok Leaf
+    parse "@x@xx" tree -- Ok (Node Leaf (Node Leaf Leaf))
+
+Without `lazy`, this example would fail due to a circular reference.
+-}
 lazy : (() -> Parser a) -> Parser a
 lazy f state =
     let
