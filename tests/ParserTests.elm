@@ -8,14 +8,7 @@ import Parser exposing (..)
 suite : Test
 suite =
     describe "Parser"
-        [ describe "peek"
-            [ test "returns the next n characters" <|
-                \_ ->
-                    init "hello world"
-                        |> peek 5
-                        |> Expect.equal (String.toList "hello")
-            ]
-        , describe "char"
+        [ describe "char"
             [ test "matches the exact characters" <|
                 \_ ->
                     char 'h'
