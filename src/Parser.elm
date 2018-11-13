@@ -34,6 +34,39 @@ module Parser
         , string
         )
 
+{-| Easy to use text parsing.
+
+# Definitions
+@docs Parser, State, Error
+
+# Core
+@docs parse, succeed, fail, lazy
+
+# Matching Specific Text
+@docs char, string
+
+# Matching with Patterns
+@docs anyChar, anyCharExcept, when, except, end, chomp
+
+# Matching Multiple Different Patterns
+@docs oneOf
+
+# Matching Sequences
+@docs maybe, zeroOrMore, oneOrMore, sequence, until
+
+# Chaining Parsers
+@docs andThen, orElse, followedBy
+
+# Pipelines
+@docs into, grab, ignore
+
+# Transforming Parsed Values
+@docs map, withError, stringWith
+
+# High Level Parsers
+@docs separatedBy, between
+-}
+
 
 type alias Parser a =
     State -> Result Error ( State, a )

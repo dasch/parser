@@ -14,6 +14,18 @@ module Parser.Common
         , newline
         )
 
+{-| Common parsers that can be used in many contexts.
+
+# High Level Parsers
+@docs int, word
+
+# Single-Character Parsers
+@docs alpha, alphaNum, digit, upper, lower
+
+# Whitespace
+@docs space, tab, blank, blanks, newline
+-}
+
 import Parser exposing (..)
 
 
