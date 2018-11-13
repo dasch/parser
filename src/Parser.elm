@@ -487,6 +487,10 @@ except parser state =
             anyChar state
 
 
+{-| Matches a specifid character.
+
+    parse "hello" (char 'h') -- Ok 'h'
+-}
 char : Char -> Parser Char
 char chr state =
     if peek 1 state == [ chr ] then
@@ -495,6 +499,10 @@ char chr state =
         fail ("expected char " ++ String.fromChar chr) state
 
 
+{-| Matches a specific string.
+
+    parse "hello world" (string "hello") -- Ok "hello"
+-}
 string : String -> Parser String
 string str =
     String.toList str
