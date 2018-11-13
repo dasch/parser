@@ -204,12 +204,24 @@ andThen next parser state =
             (\( newState, val ) -> next val newState)
 
 
+{-| Create a parser that depends on a previous parser succeeding. Unlike
+[`andThen`](#andThen), this does not preserve the value of the first parser,
+so it's only useful when you want to discard that value.
+
+    atMention : Parser String
+    atMention =
+        char '@'
+            |> followedBy username
+
+-}
 followedBy : Parser a -> Parser b -> Parser a
 followedBy kept ignored =
     ignored
         |> andThen (\_ -> kept)
 
 
+{-| Create a fallback for when a parser fails.
+-}
 orElse : Parser a -> Parser a -> Parser a
 orElse fallback parser state =
     case parser state of
@@ -220,17 +232,45 @@ orElse fallback parser state =
             Ok ( newState, x )
 
 
+{-| Map the value of a parser.
+
+    map (\x -> x * x) int
+-}
 map : (a -> b) -> Parser a -> Parser b
 map f parser =
     parser
         |> andThen (\x -> succeed (f x))
 
 
+{-| Start a parser pipeline that feeds values into a function.
+
+Typically used to build up complex values.
+
+    type Operation = Binary Int Char Int
+
+    operation : Parser Operation
+    operation =
+        into Operation
+            |> grab int
+            |> ignore blanks
+            |> grab (oneOf [ char '+', char '-', char '*' ])
+            |> ignore blanks
+            |> grab int
+
+    parse "42 * 13" operation -- Binary 42 '*' 13
+
+Here we feed three values into `Operation` while ignoring blank characters between
+the values.
+-}
 into : (a -> b) -> Parser (a -> b)
 into =
     succeed
 
 
+{-| Grabs a value and feeds it into a function in a pipeline.
+
+See [`into`](#into).
+-}
 grab : Parser a -> Parser (a -> b) -> Parser b
 grab next =
     andThen
@@ -240,6 +280,10 @@ grab next =
         )
 
 
+{-| Ignores a matched value, preserving the previous value in a pipeline.
+
+See [`into`](#into).
+-}
 ignore : Parser a -> Parser b -> Parser b
 ignore next =
     andThen
@@ -249,6 +293,12 @@ ignore next =
         )
 
 
+{-| Maybe match a value. If the parser succeeds with `x`, we'll succeed with
+`Just x`. If if fails, we'll succeed with `Nothing`.
+
+    parse "42" (maybe int) -- Just 42
+    parse "hello" (maybe int) -- Nothing
+-}
 maybe : Parser a -> Parser (Maybe a)
 maybe parser =
     parser
