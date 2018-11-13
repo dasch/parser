@@ -1,4 +1,38 @@
-module Parser exposing (..)
+module Parser
+    exposing
+        ( Parser
+        , State
+        , Error
+        , parse
+        , succeed
+        , fail
+        , lazy
+        , withError
+        , andThen
+        , orElse
+        , followedBy
+        , map
+        , into
+        , grab
+        , ignore
+        , maybe
+        , zeroOrMore
+        , oneOrMore
+        , sequence
+        , oneOf
+        , until
+        , between
+        , separatedBy
+        , end
+        , anyChar
+        , anyCharExcept
+        , stringWith
+        , chomp
+        , when
+        , except
+        , char
+        , string
+        )
 
 
 type alias Parser a =
