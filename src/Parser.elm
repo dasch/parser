@@ -146,14 +146,14 @@ evaluation.
 
     leaf : Parser Tree
     leaf =
-        char 'x'
+        map (always Leaf) (char 'x')
 
     node : Parser Tree
     node =
         into Node
             |> ignore (char '@')
-            |> grab (lazy (\_ -> tree)
-            |> grab (lazy (\_ -> tree)
+            |> grab (lazy (\_ -> tree))
+            |> grab (lazy (\_ -> tree))
 
     parse "x" tree -- Ok Leaf
     parse "@x@xx" tree -- Ok (Node Leaf (Node Leaf Leaf))
