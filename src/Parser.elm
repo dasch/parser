@@ -169,12 +169,34 @@ lazy f state =
         parser state
 
 
+{-| Use the specified error message when the parser fails.
+
+    string "</div>"
+        |> withError "expected closing tag"
+-}
 withError : String -> Parser a -> Parser a
 withError msg parser state =
     parser state
         |> Result.mapError (\err -> { err | message = msg })
 
 
+{-| Create a parser that depends on the a previous result.
+
+For example, you can support two different versions of a format if there's
+a version number included:
+
+    spec : Parser Spec
+    spec =
+        let
+            specByVersion version =
+                case version of
+                    1 -> v1 -- assume v1 is a Parser Spec
+                    2 -> v2 -- assume v2 is a Parser Spec
+                    x -> fail ("unknown spec version " ++ String.fromInt x)
+        in
+            string "version="
+                |> andThen specByVersion
+-}
 andThen : (a -> Parser b) -> Parser a -> Parser b
 andThen next parser state =
     parser state
