@@ -28,12 +28,8 @@ init input =
 
 parse : String -> Parser a -> Result Error a
 parse input parser =
-    case parser (init input) of
-        Ok ( state, value ) ->
-            Ok value
-
-        Err err ->
-            Err err
+    parser (init input)
+        |> Result.map (\( _, value ) -> value)
 
 
 succeed : a -> Parser a
