@@ -305,6 +305,12 @@ maybe parser =
         |> orElse (succeed Nothing)
 
 
+{-| Matches zero or more successive occurrences of a value. Succeeds with
+an empty list if there are no occurrences.
+
+    parse "xxy" (zeroOrMore (char 'x')) -- Ok [ 'x', 'x' ]
+    parse "yyy" (zeroOrMore (char 'x')) -- Ok []
+-}
 zeroOrMore : Parser a -> Parser (List a)
 zeroOrMore parser state =
     let
@@ -319,6 +325,12 @@ zeroOrMore parser state =
         Ok (agg [] state)
 
 
+{-| Matches one or more successive occurrences of a value. Fails if
+there are no occurrences.
+
+    parse "xxy" (oneOrMore (char 'x')) -- Ok [ 'x', 'x' ]
+    parse "yyy" (oneOrMore (char 'x')) -- Err { message = "expected char `x`", position = 0 }
+-}
 oneOrMore : Parser a -> Parser (List a)
 oneOrMore parser =
     parser
