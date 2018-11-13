@@ -130,7 +130,7 @@ keyValue =
 
 key : Parser String
 key =
-    oneOrMore (when Char.isAlphaNum)
+    oneOrMore (charWhere Char.isAlphaNum)
         |> map String.fromList
 
 

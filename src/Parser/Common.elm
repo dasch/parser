@@ -57,27 +57,27 @@ word =
 
 alpha : Parser Char
 alpha =
-    when Char.isAlpha
+    charWhere Char.isAlpha
 
 
 alphaNum : Parser Char
 alphaNum =
-    when Char.isAlphaNum
+    charWhere Char.isAlphaNum
 
 
 digit : Parser Char
 digit =
-    when Char.isDigit
+    charWhere Char.isDigit
 
 
 upper : Parser Char
 upper =
-    when Char.isUpper
+    charWhere Char.isUpper
 
 
 lower : Parser Char
 lower =
-    when Char.isLower
+    charWhere Char.isLower
 
 
 space : Parser Char

@@ -25,9 +25,9 @@ module Parser
         , end
         , anyChar
         , anyCharExcept
+        , charWhere
         , stringWith
         , chomp
-        , when
         , except
         , char
         , string
@@ -45,7 +45,7 @@ module Parser
 @docs char, string
 
 # Matching with Patterns
-@docs anyChar, anyCharExcept, when, except, end, chomp
+@docs anyChar, anyCharExcept, charWhere, except, end, chomp
 
 # Matching Multiple Different Patterns
 @docs oneOf
@@ -450,7 +450,19 @@ anyChar state =
 
 anyCharExcept : Char -> Parser Char
 anyCharExcept chr =
-    when (\c -> c /= chr)
+    charWhere (\c -> c /= chr)
+
+
+charWhere : (Char -> Bool) -> Parser Char
+charWhere predicate =
+    anyChar
+        |> andThen
+            (\c ->
+                if predicate c then
+                    succeed c
+                else
+                    fail "failed predicate"
+            )
 
 
 stringWith : Parser (List Char) -> Parser String
@@ -463,19 +475,6 @@ chomp n =
     List.repeat n (anyChar)
         |> sequence
         |> map String.fromList
-
-
-when : (Char -> Bool) -> Parser Char
-when predicate state =
-    case state.remaining of
-        chr :: _ ->
-            if predicate chr then
-                Ok ( advance 1 state, chr )
-            else
-                fail ("char " ++ String.fromChar chr ++ " failed predicate") state
-
-        _ ->
-            fail "end of input" state
 
 
 except : Parser Char -> Parser Char
