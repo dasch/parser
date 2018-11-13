@@ -337,6 +337,11 @@ oneOrMore parser =
         |> andThen (\val -> map ((::) val) (zeroOrMore parser))
 
 
+{-| Matches a sequence of parsers in turn, succeeding with a list of
+their values if they *all* succeed.
+
+    parse "helloworld" (sequence [ string "hello", "world" ]) -- Ok [ "hello", "world" ]
+-}
 sequence : List (Parser a) -> Parser (List a)
 sequence parsers =
     case parsers of
@@ -348,6 +353,10 @@ sequence parsers =
                 |> andThen (\x -> map (\xs -> x :: xs) (sequence rest))
 
 
+{-| Matches one of a list of parsers.
+
+    parse "y" (oneOf [ char 'x', char 'y' ]) -- Ok 'y'
+-}
 oneOf : List (Parser a) -> Parser a
 oneOf parsers =
     List.foldl orElse (fail "") parsers
@@ -367,6 +376,12 @@ advance length state =
     }
 
 
+{-| Matches zero or more values until a "stop" parser matches.
+
+    char '['
+        |> until (char ']') anyChar
+        |> parse "[abc]" -- Ok [ 'a', 'b', 'c' ]
+-}
 until : Parser a -> Parser b -> Parser (List b)
 until stop parser state =
     let
@@ -386,6 +401,11 @@ until stop parser state =
                 follow state
 
 
+{-| Matches zero or more values separated by a specified parser.
+
+    separatedBy (char ',') int
+        |> parse "42,13,99" -- Ok [ 42, 13, 99 ]
+-}
 separatedBy : Parser s -> Parser a -> Parser (List a)
 separatedBy separator parser =
     let
@@ -405,6 +425,12 @@ separatedBy separator parser =
         oneOf [ multipleElements, oneElement, empty ]
 
 
+{-| Matches the end of the input.
+
+    char 'x'
+        |> followedBy end
+        |> parse "x" -- Ok ()
+-}
 end : Parser ()
 end state =
     if state.remaining == [] then
@@ -413,6 +439,8 @@ end state =
         fail "expected end" state
 
 
+{-| Matches any character.
+-}
 anyChar : Parser Char
 anyChar state =
     List.head state.remaining
