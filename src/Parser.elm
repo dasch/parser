@@ -21,7 +21,6 @@ module Parser
         , sequence
         , oneOf
         , until
-        , between
         , separatedBy
         , end
         , anyChar
@@ -64,7 +63,7 @@ module Parser
 @docs map, withError, stringWith
 
 # High Level Parsers
-@docs separatedBy, between
+@docs separatedBy
 -}
 
 
@@ -373,14 +372,6 @@ until stop parser state =
 
             Err _ ->
                 follow state
-
-
-between : Parser a -> Parser b -> Parser c -> Parser (List c)
-between open close inner =
-    succeed identity
-        |> ignore open
-        |> grab (until close inner)
-        |> ignore close
 
 
 separatedBy : Parser s -> Parser a -> Parser (List a)

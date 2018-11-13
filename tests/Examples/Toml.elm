@@ -150,3 +150,11 @@ blankLine =
 tuple : a -> b -> ( a, b )
 tuple a b =
     ( a, b )
+
+
+between : Parser a -> Parser b -> Parser c -> Parser (List c)
+between open close inner =
+    succeed identity
+        |> ignore open
+        |> grab (until close inner)
+        |> ignore close
