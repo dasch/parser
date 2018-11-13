@@ -68,10 +68,17 @@ module Parser
 -}
 
 
+{-| A `Parser a` is an instruction for how to take some input text and turn it
+into an `a` value as an updated input text that has had some prefix removed.
+
+If a parser fails to turn the input into a value, it fails with `Error`.
+-}
 type alias Parser a =
     State -> Result Error ( State, a )
 
 
+{-| The state of a parsing process.
+-}
 type alias State =
     { input : String
     , remaining : List Char
@@ -79,6 +86,9 @@ type alias State =
     }
 
 
+{-| Describes an error during parsing, i.e. what caused a parser to fail, and at
+what position into the input text it failed.
+-}
 type alias Error =
     { message : String
     , position : Int
@@ -93,6 +103,13 @@ init input =
     }
 
 
+{-| Parse an input string using a specific parser, returning a result containing
+either the parsed value or an error.
+
+
+    parse "xyz" (char 'x') -- Ok 'x'
+    parse "xyz" (char 'w') -- Err { message = "expected char w", position = 0 }
+-}
 parse : String -> Parser a -> Result Error a
 parse input parser =
     parser (init input)
