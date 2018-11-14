@@ -1,7 +1,6 @@
 module Parser
     exposing
         ( Parser
-        , State
         , Error
         , parse
         , succeed
@@ -78,11 +77,12 @@ type alias Parser a =
 
 {-| The state of a parsing process.
 -}
-type alias State =
-    { input : String
-    , remaining : List Char
-    , position : Int
-    }
+type State
+    = State
+        { input : String
+        , remaining : List Char
+        , position : Int
+        }
 
 
 {-| Describes an error during parsing, i.e. what caused a parser to fail, and at
@@ -96,10 +96,11 @@ type alias Error =
 
 init : String -> State
 init input =
-    { input = input
-    , remaining = String.toList input
-    , position = 0
-    }
+    State
+        { input = input
+        , remaining = String.toList input
+        , position = 0
+        }
 
 
 {-| Parse an input string using a specific parser, returning a result containing
@@ -130,7 +131,7 @@ input.
     parse "xyz" (fail "nope") -- Err { message = "nope", position = 0 }
 -}
 fail : String -> Parser a
-fail str state =
+fail str (State state) =
     Err { message = str, position = state.position }
 
 
@@ -374,16 +375,17 @@ oneOf parsers =
 
 
 peek : Int -> State -> List Char
-peek length state =
+peek length (State state) =
     List.take length state.remaining
 
 
 advance : Int -> State -> State
-advance length state =
-    { state
-        | position = state.position + length
-        , remaining = List.drop length state.remaining
-    }
+advance length (State state) =
+    State
+        { state
+            | position = state.position + length
+            , remaining = List.drop length state.remaining
+        }
 
 
 {-| Matches zero or more values until a "stop" parser matches.
@@ -442,19 +444,19 @@ separatedBy separator parser =
         |> parse "x" -- Ok ()
 -}
 end : Parser ()
-end state =
+end (State state) =
     if state.remaining == [] then
-        Ok ( state, () )
+        Ok ( State state, () )
     else
-        fail "expected end" state
+        fail "expected end" (State state)
 
 
 {-| Matches any character.
 -}
 anyChar : Parser Char
-anyChar state =
+anyChar (State state) =
     List.head state.remaining
-        |> Maybe.map (\chr -> ( advance 1 state, chr ))
+        |> Maybe.map (\chr -> ( advance 1 (State state), chr ))
         |> Result.fromMaybe { message = "expected any char", position = state.position }
 
 
