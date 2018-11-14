@@ -367,7 +367,7 @@ oneOrMore parser =
 {-| Matches a sequence of parsers in turn, succeeding with a list of
 their values if they *all* succeed.
 
-    parse "helloworld" (sequence [ string "hello", "world" ]) -- Ok [ "hello", "world" ]
+    parse "helloworld" (sequence [ string "hello", string "world" ]) -- Ok [ "hello", "world" ]
 -}
 sequence : List (Parser a) -> Parser (List a)
 sequence parsers =
