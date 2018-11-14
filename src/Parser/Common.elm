@@ -36,14 +36,16 @@ import Parser exposing (..)
 int : Parser Int
 int =
     let
-        parseInt : List Char -> State -> Result Error ( State, Int )
-        parseInt digits newState =
-            String.fromList digits
-                |> String.toInt
-                |> Result.fromMaybe (Error "invalid int" newState.position)
-                |> Result.map (\x -> ( newState, x ))
+        parseInt : String -> Parser Int
+        parseInt digits =
+            case String.toInt digits of
+                Just x ->
+                    succeed x
+
+                Nothing ->
+                    fail "invalid int"
     in
-        oneOrMore digit
+        stringWith (oneOrMore digit)
             |> andThen parseInt
             |> withError "expected int"
 
