@@ -503,6 +503,7 @@ when predicate =
 {-| Matches a character if the specified parser *fails*.
 
     parse "xyz" (except (char 'a')) -- Ok 'x'
+    parse "xyz" (except (char 'x')) -- Err { message = "expected to not match", ... }
 -}
 except : Parser Char -> Parser Char
 except parser =
