@@ -25,7 +25,7 @@ module Parser
         , separatedBy
         , end
         , anyChar
-        , charWhere
+        , when
         , stringWith
         , chomp
         , except
@@ -45,7 +45,7 @@ module Parser
 @docs char, string
 
 # Matching with Patterns
-@docs anyChar, charWhere, except, end, chomp
+@docs anyChar, when, except, end, chomp
 
 # Matching Multiple Different Patterns
 @docs oneOf
@@ -460,10 +460,10 @@ anyChar state =
 
 {-| Matches a character if some predicate holds.
 
-    parse "123" (charWhere Char.isDigit) -- Ok '1'
+    parse "123" (when Char.isDigit) -- Ok '1'
 -}
-charWhere : (Char -> Bool) -> Parser Char
-charWhere predicate =
+when : (Char -> Bool) -> Parser Char
+when predicate =
     anyChar
         |> andThen
             (\c ->

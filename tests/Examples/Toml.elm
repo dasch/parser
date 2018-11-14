@@ -144,7 +144,7 @@ keyValue =
 
 key : Parser String
 key =
-    oneOrMore (charWhere Char.isAlphaNum)
+    oneOrMore (when Char.isAlphaNum)
         |> map String.fromList
 
 

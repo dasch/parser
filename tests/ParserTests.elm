@@ -28,15 +28,15 @@ suite =
                         |> parse "hello world"
                         |> Expect.equal (Ok "hello")
             ]
-        , describe "charWhere"
+        , describe "when"
             [ test "succeeds when the predicate holds" <|
                 \_ ->
-                    charWhere Char.isUpper
+                    when Char.isUpper
                         |> parse "Hello world"
                         |> Expect.equal (Ok 'H')
             , test "fails when the predicate fails" <|
                 \_ ->
-                    charWhere Char.isUpper
+                    when Char.isUpper
                         |> parse "hello world"
                         |> Expect.equal (Err { message = "failed predicate", position = 1 })
             ]
