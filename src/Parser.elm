@@ -476,11 +476,21 @@ charWhere predicate =
             )
 
 
+{-| Turns a parser that returns a list of characters into a parser that
+returns a String.
+
+    parse "xyz" (stringWith (sequence [ char 'x', anyChar, char 'z' ])) -- Ok "xyz"
+-}
 stringWith : Parser (List Char) -> Parser String
 stringWith =
     map String.fromList
 
 
+{-| A parser that simply reads a specific number of characters from the
+input.
+
+    parse "xyz" (chomp 2) -- Ok "xy"
+-}
 chomp : Int -> Parser String
 chomp n =
     List.repeat n (anyChar)
