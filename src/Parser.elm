@@ -474,6 +474,20 @@ when predicate =
             )
 
 
+{-| Matches a character if the specified parser *fails*.
+
+    parse "xyz" (except (char 'a')) -- Ok 'x'
+-}
+except : Parser Char -> Parser Char
+except parser state =
+    case parser state of
+        Ok _ ->
+            fail "expected to not match" state
+
+        Err _ ->
+            anyChar state
+
+
 {-| Turns a parser that returns a list of characters into a parser that
 returns a String.
 
@@ -494,16 +508,6 @@ chomp n =
     List.repeat n (anyChar)
         |> sequence
         |> map String.fromList
-
-
-except : Parser Char -> Parser Char
-except parser state =
-    case parser state of
-        Ok _ ->
-            fail "expected to not match" state
-
-        Err _ ->
-            anyChar state
 
 
 {-| Matches a specifid character.
