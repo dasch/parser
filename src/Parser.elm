@@ -360,8 +360,7 @@ there are no occurrences.
 -}
 oneOrMore : Parser a -> Parser (List a)
 oneOrMore parser =
-    parser
-        |> andThen (\val -> map ((::) val) (zeroOrMore parser))
+    map2 (::) parser (zeroOrMore parser)
 
 
 {-| Matches a sequence of parsers in turn, succeeding with a list of
