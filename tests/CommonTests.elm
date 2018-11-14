@@ -22,16 +22,17 @@ suite =
                         |> Expect.equal (Err { message = "expected int", position = 1 })
             ]
         , describe "word"
-            [ test "matches start with an alpha char" <|
+            [ test "matches words" <|
                 \_ ->
-                    word
-                        |> parse "xy123"
-                        |> Expect.equal (Ok "xy123")
-            , test "matches underscores" <|
-                \_ ->
-                    word
-                        |> parse "xy123"
-                        |> Expect.equal (Ok "xy123")
+                    let
+                        examples =
+                            [ "xy123"
+                            , "_h_"
+                            , "_"
+                            , "hello_world"
+                            ]
+                    in
+                        expectMatch examples word
             , test "fails on non-word char" <|
                 \_ ->
                     word
@@ -84,3 +85,7 @@ suite =
                         |> Expect.equal (Ok '\n')
             ]
         ]
+
+
+expectMatch examples parser =
+    Expect.all (List.map (\example p -> Expect.ok (parse example p)) examples) parser
