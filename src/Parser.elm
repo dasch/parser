@@ -35,7 +35,7 @@ module Parser
 {-| Easy to use text parsing.
 
 # Definitions
-@docs Parser, State, Error
+@docs Parser, Error
 
 # Core
 @docs parse, succeed, fail, lazy
