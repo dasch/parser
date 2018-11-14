@@ -194,7 +194,7 @@ withError msg parser =
                 |> Result.mapError (\err -> { err | message = msg })
 
 
-{-| Create a parser that depends on the a previous result.
+{-| Create a parser that depends on the previous parser's result.
 
 For example, you can support two different versions of a format if there's
 a version number included:
