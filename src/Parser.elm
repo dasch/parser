@@ -416,7 +416,7 @@ advance length (State state) =
 {-| Matches zero or more values until a "stop" parser matches.
 
     char '['
-        |> until (char ']') anyChar
+        |> followedBy (until (char ']') anyChar)
         |> parse "[abc]" -- Ok [ 'a', 'b', 'c' ]
 -}
 until : Parser a -> Parser b -> Parser (List b)
