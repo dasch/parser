@@ -330,18 +330,11 @@ an empty list if there are no occurrences.
 -}
 zeroOrMore : Parser a -> Parser (List a)
 zeroOrMore parser =
-    Parser <|
-        \state ->
-            let
-                agg values currState =
-                    case run parser currState of
-                        Ok ( newState, val ) ->
-                            agg (val :: values) newState
-
-                        Err err ->
-                            ( currState, List.reverse values )
-            in
-                Ok (agg [] state)
+    oneOf
+        [ parser
+            |> andThen (\x -> map (\xs -> x :: xs) (zeroOrMore parser))
+        , succeed []
+        ]
 
 
 {-| Matches one or more successive occurrences of a value. Fails if
