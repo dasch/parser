@@ -375,8 +375,7 @@ sequence parsers =
             succeed []
 
         parser :: rest ->
-            parser
-                |> andThen (\x -> map (\xs -> x :: xs) (sequence rest))
+            map2 (::) parser (sequence rest)
 
 
 {-| Matches a specific number of occurrences of a parser, succeeding with a list
