@@ -11,6 +11,7 @@ module Parser
         , orElse
         , followedBy
         , map
+        , map2
         , into
         , grab
         , ignore
@@ -258,6 +259,21 @@ map f parser =
         |> andThen (\x -> succeed (f x))
 
 
+{-| Matches two parsers and combines the result.
+
+    map2 (\x y -> (x, y)) anyChar anyChar
+        |> parse "xy" -- Ok ('x', 'y')
+-}
+map2 : (a -> b -> c) -> Parser a -> Parser b -> Parser c
+map2 f p1 p2 =
+    p1
+        |> andThen
+            (\x ->
+                p2
+                    |> andThen (\y -> succeed (f x y))
+            )
+
+
 {-| Start a parser pipeline that feeds values into a function.
 
 Typically used to build up complex values.
@@ -331,8 +347,7 @@ an empty list if there are no occurrences.
 zeroOrMore : Parser a -> Parser (List a)
 zeroOrMore parser =
     oneOf
-        [ parser
-            |> andThen (\x -> map (\xs -> x :: xs) (zeroOrMore parser))
+        [ map2 (::) parser (lazy (\_ -> zeroOrMore parser))
         , succeed []
         ]
 
