@@ -51,7 +51,7 @@ module Parser
 @docs oneOf
 
 # Matching Sequences
-@docs maybe, zeroOrMore, oneOrMore, sequence, until
+@docs maybe, zeroOrMore, oneOrMore, sequence, repeat, until
 
 # Chaining Parsers
 @docs andThen, orElse, followedBy
