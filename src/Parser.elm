@@ -71,8 +71,8 @@ into an `a` value as an updated input text that has had some prefix removed.
 
 If a parser fails to turn the input into a value, it fails with `Error`.
 -}
-type alias Parser a =
-    State -> Result Error ( State, a )
+type Parser a
+    = Parser (State -> Result Error ( State, a ))
 
 
 {-| The state of a parsing process.
@@ -103,16 +103,20 @@ init input =
         }
 
 
+run : Parser a -> State -> Result Error ( State, a )
+run (Parser parser) state =
+    parser state
+
+
 {-| Parse an input string using a specific parser, returning a result containing
 either the parsed value or an error.
-
 
     parse "xyz" (char 'x') -- Ok 'x'
     parse "xyz" (char 'w') -- Err { message = "expected char w", position = 0 }
 -}
 parse : String -> Parser a -> Result Error a
 parse input parser =
-    parser (init input)
+    run parser (init input)
         |> Result.map (\( _, value ) -> value)
 
 
@@ -121,8 +125,10 @@ parse input parser =
     parse "xyz" (succeed 42) -- Ok 42
 -}
 succeed : a -> Parser a
-succeed val state =
-    Ok ( state, val )
+succeed val =
+    Parser <|
+        \state ->
+            Ok ( state, val )
 
 
 {-| A parser that always fails with a specified error message without reading any
@@ -131,8 +137,10 @@ input.
     parse "xyz" (fail "nope") -- Err { message = "nope", position = 0 }
 -}
 fail : String -> Parser a
-fail str (State state) =
-    Err { message = str, position = state.position }
+fail str =
+    Parser <|
+        \(State state) ->
+            Err { message = str, position = state.position }
 
 
 {-| In order to support self-referential parsers, you need to introduce lazy
@@ -161,12 +169,14 @@ evaluation.
 Without `lazy`, this example would fail due to a circular reference.
 -}
 lazy : (() -> Parser a) -> Parser a
-lazy f state =
-    let
-        parser =
-            f ()
-    in
-        parser state
+lazy f =
+    Parser <|
+        \state ->
+            let
+                (Parser parser) =
+                    f ()
+            in
+                parser state
 
 
 {-| Use the specified error message when the parser fails.
@@ -175,9 +185,11 @@ lazy f state =
         |> withError "expected closing tag"
 -}
 withError : String -> Parser a -> Parser a
-withError msg parser state =
-    parser state
-        |> Result.mapError (\err -> { err | message = msg })
+withError msg parser =
+    Parser <|
+        \state ->
+            run parser state
+                |> Result.mapError (\err -> { err | message = msg })
 
 
 {-| Create a parser that depends on the a previous result.
@@ -198,10 +210,12 @@ a version number included:
                 |> andThen specByVersion
 -}
 andThen : (a -> Parser b) -> Parser a -> Parser b
-andThen next parser state =
-    parser state
-        |> Result.andThen
-            (\( newState, val ) -> next val newState)
+andThen next parser =
+    Parser <|
+        \state ->
+            run parser state
+                |> Result.andThen
+                    (\( newState, val ) -> run (next val) newState)
 
 
 {-| Create a parser that depends on a previous parser succeeding. Unlike
@@ -223,13 +237,15 @@ followedBy kept ignored =
 {-| Create a fallback for when a parser fails.
 -}
 orElse : Parser a -> Parser a -> Parser a
-orElse fallback parser state =
-    case parser state of
-        Err _ ->
-            fallback state
+orElse fallback parser =
+    Parser <|
+        \state ->
+            case run parser state of
+                Err _ ->
+                    run fallback state
 
-        Ok ( newState, x ) ->
-            Ok ( newState, x )
+                Ok ( newState, x ) ->
+                    Ok ( newState, x )
 
 
 {-| Map the value of a parser.
@@ -313,17 +329,19 @@ an empty list if there are no occurrences.
     parse "yyy" (zeroOrMore (char 'x')) -- Ok []
 -}
 zeroOrMore : Parser a -> Parser (List a)
-zeroOrMore parser state =
-    let
-        agg values currState =
-            case parser currState of
-                Ok ( newState, val ) ->
-                    agg (val :: values) newState
+zeroOrMore parser =
+    Parser <|
+        \state ->
+            let
+                agg values currState =
+                    case run parser currState of
+                        Ok ( newState, val ) ->
+                            agg (val :: values) newState
 
-                Err err ->
-                    ( currState, List.reverse values )
-    in
-        Ok (agg [] state)
+                        Err err ->
+                            ( currState, List.reverse values )
+            in
+                Ok (agg [] state)
 
 
 {-| Matches one or more successive occurrences of a value. Fails if
@@ -395,22 +413,24 @@ advance length (State state) =
         |> parse "[abc]" -- Ok [ 'a', 'b', 'c' ]
 -}
 until : Parser a -> Parser b -> Parser (List b)
-until stop parser state =
-    let
-        follow =
-            parser
-                |> andThen
-                    (\x ->
-                        until stop parser
-                            |> map (\xs -> x :: xs)
-                    )
-    in
-        case stop state of
-            Ok _ ->
-                Ok ( state, [] )
+until stop parser =
+    Parser <|
+        \state ->
+            let
+                follow =
+                    parser
+                        |> andThen
+                            (\x ->
+                                until stop parser
+                                    |> map (\xs -> x :: xs)
+                            )
+            in
+                case run stop state of
+                    Ok _ ->
+                        Ok ( state, [] )
 
-            Err _ ->
-                follow state
+                    Err _ ->
+                        run follow state
 
 
 {-| Matches zero or more values separated by a specified parser.
@@ -444,20 +464,24 @@ separatedBy separator parser =
         |> parse "x" -- Ok ()
 -}
 end : Parser ()
-end (State state) =
-    if state.remaining == [] then
-        Ok ( State state, () )
-    else
-        fail "expected end" (State state)
+end =
+    Parser <|
+        \(State state) ->
+            if state.remaining == [] then
+                Ok ( State state, () )
+            else
+                Err { message = "expected end", position = state.position }
 
 
 {-| Matches any character.
 -}
 anyChar : Parser Char
-anyChar (State state) =
-    List.head state.remaining
-        |> Maybe.map (\chr -> ( advance 1 (State state), chr ))
-        |> Result.fromMaybe { message = "expected any char", position = state.position }
+anyChar =
+    Parser <|
+        \(State state) ->
+            List.head state.remaining
+                |> Maybe.map (\chr -> ( advance 1 (State state), chr ))
+                |> Result.fromMaybe { message = "expected any char", position = state.position }
 
 
 {-| Matches a character if some predicate holds.
@@ -481,13 +505,15 @@ when predicate =
     parse "xyz" (except (char 'a')) -- Ok 'x'
 -}
 except : Parser Char -> Parser Char
-except parser state =
-    case parser state of
-        Ok _ ->
-            fail "expected to not match" state
+except parser =
+    Parser <|
+        \state ->
+            case run parser state of
+                Ok _ ->
+                    run (fail "expected to not match") state
 
-        Err _ ->
-            anyChar state
+                Err _ ->
+                    run anyChar state
 
 
 {-| Turns a parser that returns a list of characters into a parser that
@@ -517,11 +543,13 @@ chomp n =
     parse "hello" (char 'h') -- Ok 'h'
 -}
 char : Char -> Parser Char
-char chr state =
-    if peek 1 state == [ chr ] then
-        Ok ( advance 1 state, chr )
-    else
-        fail ("expected char " ++ String.fromChar chr) state
+char chr =
+    Parser <|
+        \state ->
+            if peek 1 state == [ chr ] then
+                Ok ( advance 1 state, chr )
+            else
+                run (fail ("expected char " ++ String.fromChar chr)) state
 
 
 {-| Matches a specific string.
