@@ -48,6 +48,10 @@ int =
             |> withError "expected int"
 
 
+{-| Matches a "word", comprised of alphanumeric characters and `_`.
+
+    parse "hello world" word -- Ok "hello"
+-}
 word : Parser String
 word =
     let
@@ -59,51 +63,71 @@ word =
             |> withError "expected word"
 
 
+{-| Matches an alphabetic character.
+-}
 alpha : Parser Char
 alpha =
     when Char.isAlpha
 
 
+{-| Matches an alphanumeric character.
+-}
 alphaNum : Parser Char
 alphaNum =
     when Char.isAlphaNum
 
 
+{-| Matches a digit, e.g. `8`.
+-}
 digit : Parser Char
 digit =
     when Char.isDigit
 
 
+{-| Matches an uppercase alphabetic characters, e.g. `A`.
+-}
 upper : Parser Char
 upper =
     when Char.isUpper
 
 
+{-| Matches a lowercase alphabetic characters, e.g. `z`.
+-}
 lower : Parser Char
 lower =
     when Char.isLower
 
 
+{-| Matches the space character, ` `.
+-}
 space : Parser Char
 space =
     char ' '
 
 
+{-| Matches the tab character, `\t`.
+-}
 tab : Parser Char
 tab =
     char '\t'
 
 
+{-| Matches either a space or a tab.
+-}
 blank : Parser Char
 blank =
     oneOf [ space, tab ]
 
 
+{-| Matches zero or more [`blank`](#blank) characters.
+-}
 blanks : Parser String
 blanks =
     map String.fromList (zeroOrMore blank)
 
 
+{-| Matches a newline character.
+-}
 newline : Parser Char
 newline =
     char '\n'
