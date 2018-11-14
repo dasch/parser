@@ -25,7 +25,6 @@ module Parser
         , separatedBy
         , end
         , anyChar
-        , anyCharExcept
         , charWhere
         , stringWith
         , chomp
@@ -46,7 +45,7 @@ module Parser
 @docs char, string
 
 # Matching with Patterns
-@docs anyChar, anyCharExcept, charWhere, except, end, chomp
+@docs anyChar, charWhere, except, end, chomp
 
 # Matching Multiple Different Patterns
 @docs oneOf
@@ -457,11 +456,6 @@ anyChar state =
     List.head state.remaining
         |> Maybe.map (\chr -> ( advance 1 state, chr ))
         |> Result.fromMaybe { message = "expected any char", position = state.position }
-
-
-anyCharExcept : Char -> Parser Char
-anyCharExcept chr =
-    charWhere (\c -> c /= chr)
 
 
 {-| Matches a character if some predicate holds.

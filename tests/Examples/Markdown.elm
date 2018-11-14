@@ -45,5 +45,5 @@ emptyLine =
 
 nonEmptyLine : Parser String
 nonEmptyLine =
-    oneOrMore (anyCharExcept '\n')
+    oneOrMore (except (char '\n'))
         |> map String.fromList
