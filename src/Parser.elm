@@ -464,6 +464,10 @@ anyCharExcept chr =
     charWhere (\c -> c /= chr)
 
 
+{-| Matches a character if some predicate holds.
+
+    parse "123" (charWhere Char.isDigit) -- Ok '1'
+-}
 charWhere : (Char -> Bool) -> Parser Char
 charWhere predicate =
     anyChar
