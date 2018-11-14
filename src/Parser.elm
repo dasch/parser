@@ -538,7 +538,7 @@ chomp n =
         |> map String.fromList
 
 
-{-| Matches a specifid character.
+{-| Matches a specific character.
 
     parse "hello" (char 'h') -- Ok 'h'
 -}
