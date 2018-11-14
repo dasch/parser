@@ -27,6 +27,7 @@ module Parser
         , anyChar
         , when
         , stringWith
+        , matchedString
         , chomp
         , except
         , char
@@ -60,7 +61,7 @@ module Parser
 @docs into, grab, ignore
 
 # Transforming Parsed Values
-@docs map, map2, withError, stringWith
+@docs map, map2, withError, stringWith, matchedString
 
 # High Level Parsers
 @docs separatedBy
@@ -531,6 +532,27 @@ returns a String.
 stringWith : Parser (List Char) -> Parser String
 stringWith =
     map String.fromList
+
+
+{-| Maps a parser to include all the matched input as a String.
+
+    matchedString (sequence [ word, string "@", word ])
+        |> parse "hello@world!" -- Ok "hello@world"
+-}
+matchedString : Parser a -> Parser String
+matchedString parser =
+    Parser <|
+        \(State state) ->
+            case run parser (State state) of
+                Ok ( State newState, _ ) ->
+                    let
+                        str =
+                            String.slice state.position newState.position state.input
+                    in
+                        Ok ( State newState, str )
+
+                Err err ->
+                    Err err
 
 
 {-| A parser that simply reads a specific number of characters from the

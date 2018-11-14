@@ -3,6 +3,7 @@ module ParserTests exposing (..)
 import Expect exposing (Expectation)
 import Test exposing (Test, describe, test)
 import Parser exposing (..)
+import Parser.Common exposing (..)
 
 
 suite : Test
@@ -184,5 +185,13 @@ suite =
                     except (char 'x')
                         |> parse "yz"
                         |> Expect.equal (Ok 'y')
+            ]
+        , describe "matchedString"
+            [ test "succeeds with the slice of the input matched by the parser" <|
+                \_ ->
+                    sequence [ word, string "@", word ]
+                        |> matchedString
+                        |> parse "hello@world!"
+                        |> Expect.equal (Ok "hello@world")
             ]
         ]
