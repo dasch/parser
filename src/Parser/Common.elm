@@ -29,6 +29,10 @@ module Parser.Common
 import Parser exposing (..)
 
 
+{-| Matches an integer.
+
+    parse "42" int -- Ok 42
+-}
 int : Parser Int
 int =
     let
@@ -40,7 +44,7 @@ int =
                 |> Result.map (\x -> ( newState, x ))
     in
         oneOrMore digit
-            |> andThen (\digits -> parseInt digits)
+            |> andThen parseInt
             |> withError "expected int"
 
 
