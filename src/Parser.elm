@@ -19,6 +19,7 @@ module Parser
         , zeroOrMore
         , oneOrMore
         , sequence
+        , repeat
         , oneOf
         , until
         , separatedBy
@@ -351,6 +352,16 @@ sequence parsers =
         parser :: rest ->
             parser
                 |> andThen (\x -> map (\xs -> x :: xs) (sequence rest))
+
+
+{-| Matches a specific number of occurrences of a parser, succeeding with a list
+of values.
+
+    parse "xxxx" (repeat 3 (char 'x')) -- Ok [ 'x', 'x', 'x' ]
+-}
+repeat : Int -> Parser a -> Parser (List a)
+repeat n parser =
+    sequence (List.repeat n parser)
 
 
 {-| Matches one of a list of parsers.

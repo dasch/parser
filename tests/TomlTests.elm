@@ -24,6 +24,10 @@ suite =
                 \_ ->
                     parseValue "\"hello\""
                         |> expectValue (TomlString "hello")
+            , test "multiline strings" <|
+                \_ ->
+                    parseValue multilineString
+                        |> expectValue (TomlString "hello\n")
             ]
         , describe "key/value"
             [ test "simple assignment" <|
@@ -147,3 +151,10 @@ tableTests =
 expectValue : Value -> Result String Value -> Expectation
 expectValue expected =
     Expect.equal (Ok expected)
+
+
+multilineString =
+    """\"\"\"
+hello
+\"\"\"
+"""

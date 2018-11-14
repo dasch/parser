@@ -36,7 +36,7 @@ document =
 
 value : Parser Value
 value =
-    oneOf [ bool, int, string, array ]
+    oneOf [ bool, int, multilineString, string, array ]
 
 
 paddedValue : Parser Value
@@ -71,6 +71,20 @@ string : Parser Value
 string =
     between doubleQuote doubleQuote anyChar
         |> map (TomlString << String.fromList)
+
+
+multilineString : Parser Value
+multilineString =
+    let
+        open =
+            repeat 3 doubleQuote
+                |> followedBy (maybe newline)
+
+        close =
+            repeat 3 doubleQuote
+    in
+        between open close anyChar
+            |> map (TomlString << String.fromList)
 
 
 doubleQuote : Parser Char
