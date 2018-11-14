@@ -60,7 +60,7 @@ module Parser
 @docs into, grab, ignore
 
 # Transforming Parsed Values
-@docs map, withError, stringWith
+@docs map, map2, withError, stringWith
 
 # High Level Parsers
 @docs separatedBy
