@@ -21,6 +21,18 @@ suite =
                         |> parse "yolo42"
                         |> Expect.equal (Err { message = "expected int", position = 1 })
             ]
+        , describe "float"
+            [ test "it matches valid floats" <|
+                \_ ->
+                    let
+                        examples =
+                            [ 42.13
+                            , -13.5
+                            , 13.5
+                            ]
+                    in
+                    expectFloats examples float
+            ]
         , describe "word"
             [ test "matches words" <|
                 \_ ->
@@ -89,3 +101,7 @@ suite =
 
 expectMatch examples parser =
     Expect.all (List.map (\example p -> Expect.ok (parse example p)) examples) parser
+
+
+expectFloats examples parser =
+    Expect.all (List.map (\example p -> Expect.equal (Ok example) (parse (String.fromFloat example) p)) examples) parser
