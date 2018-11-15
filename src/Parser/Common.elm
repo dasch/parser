@@ -1,5 +1,5 @@
 module Parser.Common exposing
-    ( int, word
+    ( int, float, word
     , alpha, alphaNum, digit, upper, lower
     , space, tab, blank, blanks, newline
     )
@@ -9,7 +9,7 @@ module Parser.Common exposing
 
 # High Level Parsers
 
-@docs int, word
+@docs int, float, word
 
 
 # Single-Character Parsers
@@ -46,6 +46,32 @@ int =
     stringWith (oneOrMore digit)
         |> andThen parseInt
         |> withError "expected int"
+
+
+{-| Matches a float.
+
+    parse "4.2" float -- Ok 4.2
+
+-}
+float : Parser Float
+float =
+    let
+        parseFloat : String -> Parser Float
+        parseFloat digits =
+            case String.toFloat digits of
+                Just x ->
+                    succeed x
+
+                Nothing ->
+                    fail "invalid float"
+    in
+    maybe (char '-')
+        |> followedBy (oneOrMore digit)
+        |> followedBy (char '.')
+        |> followedBy (oneOrMore digit)
+        |> matchedString
+        |> andThen parseFloat
+        |> withError "expected float"
 
 
 {-| Matches a "word", comprised of alphanumeric characters and `_`.
