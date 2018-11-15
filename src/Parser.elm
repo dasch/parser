@@ -1,70 +1,68 @@
-module Parser
-    exposing
-        ( Parser
-        , Error
-        , parse
-        , succeed
-        , fail
-        , lazy
-        , withError
-        , andThen
-        , orElse
-        , followedBy
-        , map
-        , map2
-        , into
-        , grab
-        , ignore
-        , maybe
-        , zeroOrMore
-        , oneOrMore
-        , sequence
-        , repeat
-        , oneOf
-        , until
-        , separatedBy
-        , end
-        , anyChar
-        , when
-        , stringWith
-        , matchedString
-        , chomp
-        , except
-        , char
-        , string
-        )
+module Parser exposing
+    ( Parser, Error
+    , parse, succeed, fail, lazy
+    , char, string
+    , anyChar, when, except, end, chomp
+    , oneOf
+    , maybe, zeroOrMore, oneOrMore, sequence, repeat, until
+    , andThen, orElse, followedBy
+    , into, grab, ignore
+    , map, map2, withError, stringWith, matchedString
+    , separatedBy
+    )
 
 {-| Easy to use text parsing.
 
+
 # Definitions
+
 @docs Parser, Error
 
+
 # Core
+
 @docs parse, succeed, fail, lazy
 
+
 # Matching Specific Text
+
 @docs char, string
 
+
 # Matching with Patterns
+
 @docs anyChar, when, except, end, chomp
 
+
 # Matching Multiple Different Patterns
+
 @docs oneOf
 
+
 # Matching Sequences
+
 @docs maybe, zeroOrMore, oneOrMore, sequence, repeat, until
 
+
 # Chaining Parsers
+
 @docs andThen, orElse, followedBy
 
+
 # Pipelines
+
 @docs into, grab, ignore
 
+
 # Transforming Parsed Values
+
 @docs map, map2, withError, stringWith, matchedString
 
+
 # High Level Parsers
+
 @docs separatedBy
+
 -}
 
 
@@ -72,6 +70,7 @@ module Parser
 into an `a` value as an updated input text that has had some prefix removed.
 
 If a parser fails to turn the input into a value, it fails with `Error`.
+
 -}
 type Parser a
     = Parser (State -> Result Error ( State, a ))
@@ -114,7 +113,9 @@ run (Parser parser) state =
 either the parsed value or an error.
 
     parse "xyz" (char 'x') -- Ok 'x'
+
     parse "xyz" (char 'w') -- Err { message = "expected char w", position = 0 }
+
 -}
 parse : String -> Parser a -> Result Error a
 parse input parser =
@@ -125,6 +126,7 @@ parse input parser =
 {-| A parser that always succeeds with a specified value without reading any input.
 
     parse "xyz" (succeed 42) -- Ok 42
+
 -}
 succeed : a -> Parser a
 succeed val =
@@ -137,6 +139,7 @@ succeed val =
 input.
 
     parse "xyz" (fail "nope") -- Err { message = "nope", position = 0 }
+
 -}
 fail : String -> Parser a
 fail str =
@@ -169,6 +172,7 @@ evaluation.
     parse "@x@xx" tree -- Ok (Node Leaf (Node Leaf Leaf))
 
 Without `lazy`, this example would fail due to a circular reference.
+
 -}
 lazy : (() -> Parser a) -> Parser a
 lazy f =
@@ -178,13 +182,14 @@ lazy f =
                 (Parser parser) =
                     f ()
             in
-                parser state
+            parser state
 
 
 {-| Use the specified error message when the parser fails.
 
     string "</div>"
         |> withError "expected closing tag"
+
 -}
 withError : String -> Parser a -> Parser a
 withError msg parser =
@@ -204,12 +209,20 @@ a version number included:
         let
             specByVersion version =
                 case version of
-                    1 -> v1 -- assume v1 is a Parser Spec
-                    2 -> v2 -- assume v2 is a Parser Spec
-                    x -> fail ("unknown spec version " ++ String.fromInt x)
+                    1 ->
+                        v1
+
+                    -- assume v1 is a Parser Spec
+                    2 ->
+                        v2
+
+                    -- assume v2 is a Parser Spec
+                    x ->
+                        fail ("unknown spec version " ++ String.fromInt x)
         in
-            string "version="
-                |> andThen specByVersion
+        string "version="
+            |> andThen specByVersion
+
 -}
 andThen : (a -> Parser b) -> Parser a -> Parser b
 andThen next parser =
@@ -253,6 +266,7 @@ orElse fallback parser =
 {-| Map the value of a parser.
 
     map (\x -> x * x) int
+
 -}
 map : (a -> b) -> Parser a -> Parser b
 map f parser =
@@ -264,6 +278,7 @@ map f parser =
 
     map2 (\x y -> (x, y)) anyChar anyChar
         |> parse "xy" -- Ok ('x', 'y')
+
 -}
 map2 : (a -> b -> c) -> Parser a -> Parser b -> Parser c
 map2 f p1 p2 =
@@ -294,6 +309,7 @@ Typically used to build up complex values.
 
 Here we feed three values into `Operation` while ignoring blank characters between
 the values.
+
 -}
 into : (a -> b) -> Parser (a -> b)
 into =
@@ -303,6 +319,7 @@ into =
 {-| Grabs a value and feeds it into a function in a pipeline.
 
 See [`into`](#into).
+
 -}
 grab : Parser a -> Parser (a -> b) -> Parser b
 grab next =
@@ -316,6 +333,7 @@ grab next =
 {-| Ignores a matched value, preserving the previous value in a pipeline.
 
 See [`into`](#into).
+
 -}
 ignore : Parser a -> Parser b -> Parser b
 ignore next =
@@ -330,7 +348,9 @@ ignore next =
 `Just x`. If if fails, we'll succeed with `Nothing`.
 
     parse "42" (maybe int) -- Just 42
+
     parse "hello" (maybe int) -- Nothing
+
 -}
 maybe : Parser a -> Parser (Maybe a)
 maybe parser =
@@ -343,7 +363,9 @@ maybe parser =
 an empty list if there are no occurrences.
 
     parse "xxy" (zeroOrMore (char 'x')) -- Ok [ 'x', 'x' ]
+
     parse "yyy" (zeroOrMore (char 'x')) -- Ok []
+
 -}
 zeroOrMore : Parser a -> Parser (List a)
 zeroOrMore parser =
@@ -357,7 +379,9 @@ zeroOrMore parser =
 there are no occurrences.
 
     parse "xxy" (oneOrMore (char 'x')) -- Ok [ 'x', 'x' ]
+
     parse "yyy" (oneOrMore (char 'x')) -- Err { message = "expected char `x`", position = 0 }
+
 -}
 oneOrMore : Parser a -> Parser (List a)
 oneOrMore parser =
@@ -365,9 +389,10 @@ oneOrMore parser =
 
 
 {-| Matches a sequence of parsers in turn, succeeding with a list of
-their values if they *all* succeed.
+their values if they _all_ succeed.
 
     parse "helloworld" (sequence [ string "hello", string "world" ]) -- Ok [ "hello", "world" ]
+
 -}
 sequence : List (Parser a) -> Parser (List a)
 sequence parsers =
@@ -383,6 +408,7 @@ sequence parsers =
 of values.
 
     parse "xxxx" (repeat 3 (char 'x')) -- Ok [ 'x', 'x', 'x' ]
+
 -}
 repeat : Int -> Parser a -> Parser (List a)
 repeat n parser =
@@ -392,6 +418,7 @@ repeat n parser =
 {-| Matches one of a list of parsers.
 
     parse "y" (oneOf [ char 'x', char 'y' ]) -- Ok 'y'
+
 -}
 oneOf : List (Parser a) -> Parser a
 oneOf parsers =
@@ -418,6 +445,7 @@ advance length (State state) =
     char '['
         |> followedBy (until (char ']') anyChar)
         |> parse "[abc]" -- Ok [ 'a', 'b', 'c' ]
+
 -}
 until : Parser a -> Parser b -> Parser (List b)
 until stop parser =
@@ -432,18 +460,19 @@ until stop parser =
                                     |> map (\xs -> x :: xs)
                             )
             in
-                case run stop state of
-                    Ok _ ->
-                        Ok ( state, [] )
+            case run stop state of
+                Ok _ ->
+                    Ok ( state, [] )
 
-                    Err _ ->
-                        run follow state
+                Err _ ->
+                    run follow state
 
 
 {-| Matches zero or more values separated by a specified parser.
 
     separatedBy (char ',') int
         |> parse "42,13,99" -- Ok [ 42, 13, 99 ]
+
 -}
 separatedBy : Parser s -> Parser a -> Parser (List a)
 separatedBy separator parser =
@@ -453,7 +482,7 @@ separatedBy separator parser =
 
         oneElement =
             parser
-                |> map (List.singleton)
+                |> map List.singleton
 
         multipleElements =
             succeed (::)
@@ -461,7 +490,7 @@ separatedBy separator parser =
                 |> ignore separator
                 |> grab (lazy (\_ -> separatedBy separator parser))
     in
-        oneOf [ multipleElements, oneElement, empty ]
+    oneOf [ multipleElements, oneElement, empty ]
 
 
 {-| Matches the end of the input.
@@ -469,6 +498,7 @@ separatedBy separator parser =
     char 'x'
         |> followedBy end
         |> parse "x" -- Ok ()
+
 -}
 end : Parser ()
 end =
@@ -476,6 +506,7 @@ end =
         \(State state) ->
             if state.remaining == [] then
                 Ok ( State state, () )
+
             else
                 Err { message = "expected end", position = state.position }
 
@@ -494,6 +525,7 @@ anyChar =
 {-| Matches a character if some predicate holds.
 
     parse "123" (when Char.isDigit) -- Ok '1'
+
 -}
 when : (Char -> Bool) -> Parser Char
 when predicate =
@@ -502,15 +534,18 @@ when predicate =
             (\c ->
                 if predicate c then
                     succeed c
+
                 else
                     fail "failed predicate"
             )
 
 
-{-| Matches a character if the specified parser *fails*.
+{-| Matches a character if the specified parser _fails_.
 
     parse "xyz" (except (char 'a')) -- Ok 'x'
+
     parse "xyz" (except (char 'x')) -- Err { message = "expected to not match", ... }
+
 -}
 except : Parser Char -> Parser Char
 except parser =
@@ -528,6 +563,7 @@ except parser =
 returns a String.
 
     parse "xyz" (stringWith (sequence [ char 'x', anyChar, char 'z' ])) -- Ok "xyz"
+
 -}
 stringWith : Parser (List Char) -> Parser String
 stringWith =
@@ -538,6 +574,7 @@ stringWith =
 
     matchedString (sequence [ word, string "@", word ])
         |> parse "hello@world!" -- Ok "hello@world"
+
 -}
 matchedString : Parser a -> Parser String
 matchedString parser =
@@ -549,7 +586,7 @@ matchedString parser =
                         str =
                             String.slice state.position newState.position state.input
                     in
-                        Ok ( State newState, str )
+                    Ok ( State newState, str )
 
                 Err err ->
                     Err err
@@ -559,10 +596,11 @@ matchedString parser =
 input.
 
     parse "xyz" (chomp 2) -- Ok "xy"
+
 -}
 chomp : Int -> Parser String
 chomp n =
-    List.repeat n (anyChar)
+    List.repeat n anyChar
         |> sequence
         |> map String.fromList
 
@@ -570,6 +608,7 @@ chomp n =
 {-| Matches a specific character.
 
     parse "hello" (char 'h') -- Ok 'h'
+
 -}
 char : Char -> Parser Char
 char chr =
@@ -577,6 +616,7 @@ char chr =
         \state ->
             if peek 1 state == [ chr ] then
                 Ok ( advance 1 state, chr )
+
             else
                 run (fail ("expected char " ++ String.fromChar chr)) state
 
@@ -584,6 +624,7 @@ char chr =
 {-| Matches a specific string.
 
     parse "hello world" (string "hello") -- Ok "hello"
+
 -}
 string : String -> Parser String
 string str =

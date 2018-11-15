@@ -1,8 +1,8 @@
-module UrlTests exposing (..)
+module UrlTests exposing (suite)
 
+import Examples.Url exposing (parse)
 import Expect exposing (Expectation)
 import Test exposing (..)
-import Examples.Url exposing (parse)
 
 
 suite : Test
@@ -21,7 +21,7 @@ suite =
                             , fragment = Just "message"
                             }
                     in
-                        parse "https://hello.com:123/greetings?recipient=world#message"
-                            |> Expect.equal (Ok expected)
+                    parse "https://hello.com:123/greetings?recipient=world#message"
+                        |> Expect.equal (Ok expected)
             ]
         ]

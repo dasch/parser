@@ -1,8 +1,8 @@
-module Examples.Bencode exposing (parse, Value(..))
+module Examples.Bencode exposing (Value(..), parse)
 
+import Dict exposing (Dict)
 import Parser exposing (..)
 import Parser.Common exposing (..)
-import Dict exposing (Dict)
 
 
 type Value
@@ -60,10 +60,10 @@ dict =
                 |> grab rawString
                 |> grab (lazy (\_ -> value))
     in
-        into (BDict << Dict.fromList)
-            |> ignore (char 'd')
-            |> grab (zeroOrMore kvPair)
-            |> ignore e
+    into (BDict << Dict.fromList)
+        |> ignore (char 'd')
+        |> grab (zeroOrMore kvPair)
+        |> ignore e
 
 
 e : Parser Char

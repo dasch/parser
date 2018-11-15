@@ -1,9 +1,9 @@
-module BencodeTests exposing (..)
+module BencodeTests exposing (expectValue, suite)
 
 import Dict
+import Examples.Bencode exposing (..)
 import Expect exposing (Expectation)
 import Test exposing (..)
-import Examples.Bencode exposing (..)
 
 
 suite : Test

@@ -1,9 +1,9 @@
-module TomlTests exposing (..)
+module TomlTests exposing (expectValue, multilineString, suite, tableTests)
 
-import Expect exposing (Expectation)
 import Dict
-import Test exposing (..)
 import Examples.Toml exposing (..)
+import Expect exposing (Expectation)
+import Test exposing (..)
 
 
 suite : Test

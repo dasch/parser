@@ -1,9 +1,9 @@
-module ParserTests exposing (..)
+module ParserTests exposing (suite)
 
 import Expect exposing (Expectation)
-import Test exposing (Test, describe, test)
 import Parser exposing (..)
 import Parser.Common exposing (..)
+import Test exposing (Test, describe, test)
 
 
 suite : Test

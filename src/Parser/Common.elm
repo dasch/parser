@@ -1,29 +1,26 @@
-module Parser.Common
-    exposing
-        ( int
-        , word
-        , alpha
-        , alphaNum
-        , digit
-        , upper
-        , lower
-        , space
-        , tab
-        , blank
-        , blanks
-        , newline
-        )
+module Parser.Common exposing
+    ( int, word
+    , alpha, alphaNum, digit, upper, lower
+    , space, tab, blank, blanks, newline
+    )
 
 {-| Common parsers that can be used in many contexts.
 
+
 # High Level Parsers
+
 @docs int, word
 
+
 # Single-Character Parsers
+
 @docs alpha, alphaNum, digit, upper, lower
 
+
 # Whitespace
+
 @docs space, tab, blank, blanks, newline
+
 -}
 
 import Parser exposing (..)
@@ -32,6 +29,7 @@ import Parser exposing (..)
 {-| Matches an integer.
 
     parse "42" int -- Ok 42
+
 -}
 int : Parser Int
 int =
@@ -45,14 +43,15 @@ int =
                 Nothing ->
                     fail "invalid int"
     in
-        stringWith (oneOrMore digit)
-            |> andThen parseInt
-            |> withError "expected int"
+    stringWith (oneOrMore digit)
+        |> andThen parseInt
+        |> withError "expected int"
 
 
 {-| Matches a "word", comprised of alphanumeric characters and `_`.
 
     parse "hello world" word -- Ok "hello"
+
 -}
 word : Parser String
 word =
@@ -60,9 +59,9 @@ word =
         wordChar =
             oneOf [ alphaNum, char '_' ]
     in
-        oneOrMore wordChar
-            |> map String.fromList
-            |> withError "expected word"
+    oneOrMore wordChar
+        |> map String.fromList
+        |> withError "expected word"
 
 
 {-| Matches an alphabetic character.
@@ -100,7 +99,7 @@ lower =
     when Char.isLower
 
 
-{-| Matches the space character, ` `.
+{-| Matches the space character, \`\`.
 -}
 space : Parser Char
 space =

@@ -1,4 +1,4 @@
-module Examples.Tree exposing (..)
+module Examples.Tree exposing (Tree(..), leaf, node, tree)
 
 import Parser exposing (..)
 

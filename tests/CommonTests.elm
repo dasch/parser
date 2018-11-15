@@ -1,9 +1,9 @@
-module CommonTests exposing (..)
+module CommonTests exposing (expectMatch, suite)
 
 import Expect exposing (Expectation)
-import Test exposing (..)
 import Parser exposing (..)
 import Parser.Common exposing (..)
+import Test exposing (..)
 
 
 suite : Test
@@ -32,7 +32,7 @@ suite =
                             , "hello_world"
                             ]
                     in
-                        expectMatch examples word
+                    expectMatch examples word
             , test "fails on non-word char" <|
                 \_ ->
                     word

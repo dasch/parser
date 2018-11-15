@@ -1,9 +1,9 @@
-module TreeTests exposing (..)
+module TreeTests exposing (suite)
 
-import Expect exposing (Expectation)
-import Test exposing (..)
-import Parser exposing (parse)
 import Examples.Tree exposing (..)
+import Expect exposing (Expectation)
+import Parser exposing (parse)
+import Test exposing (..)
 
 
 suite : Test

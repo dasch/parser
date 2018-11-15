@@ -1,8 +1,8 @@
 module Examples.Toml exposing (Value(..), parse, parseValue)
 
+import Dict exposing (Dict)
 import Parser exposing (..)
 import Parser.Common exposing (..)
-import Dict exposing (Dict)
 
 
 type Value
@@ -27,7 +27,7 @@ parseValue input =
 
 document : Parser Value
 document =
-    into (\x y -> (TomlTable (Dict.fromList (List.append x y))))
+    into (\x y -> TomlTable (Dict.fromList (List.append x y)))
         |> ignore blankLines
         |> grab (zeroOrMore keyValue)
         |> ignore blankLines
@@ -58,8 +58,8 @@ bool =
             Parser.string "false"
                 |> map (\_ -> False)
     in
-        oneOf [ true, false ]
-            |> map TomlBool
+    oneOf [ true, false ]
+        |> map TomlBool
 
 
 int : Parser Value
@@ -83,8 +83,8 @@ multilineString =
         close =
             repeat 3 doubleQuote
     in
-        between open close anyChar
-            |> map (TomlString << String.fromList)
+    between open close anyChar
+        |> map (TomlString << String.fromList)
 
 
 doubleQuote : Parser Char
@@ -98,10 +98,10 @@ array =
         elements =
             zeroOrMore int
     in
-        into TomlArray
-            |> ignore (char '[')
-            |> grab (separatedBy (char ',') paddedValue)
-            |> ignore (char ']')
+    into TomlArray
+        |> ignore (char '[')
+        |> grab (separatedBy (char ',') paddedValue)
+        |> ignore (char ']')
 
 
 table : Parser ( String, Value )
@@ -116,11 +116,11 @@ table =
                 |> ignore (char ']')
                 |> ignore (maybe newline)
     in
-        into tuple
-            |> ignore blankLines
-            |> grab heading
-            |> ignore blankLines
-            |> grab keyValues
+    into tuple
+        |> ignore blankLines
+        |> grab heading
+        |> ignore blankLines
+        |> grab keyValues
 
 
 keyValues : Parser Value
