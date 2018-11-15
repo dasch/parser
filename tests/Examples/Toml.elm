@@ -116,7 +116,7 @@ table =
                 |> ignore (char ']')
                 |> ignore (maybe newline)
     in
-    into tuple
+    into Tuple.pair
         |> ignore blankLines
         |> grab heading
         |> ignore blankLines
@@ -131,7 +131,7 @@ keyValues =
 
 keyValue : Parser ( String, Value )
 keyValue =
-    into tuple
+    into Tuple.pair
         |> ignore blanks
         |> grab key
         |> ignore blanks
@@ -159,11 +159,6 @@ blankLine =
     succeed ()
         |> ignore blanks
         |> ignore newline
-
-
-tuple : a -> b -> ( a, b )
-tuple a b =
-    ( a, b )
 
 
 between : Parser a -> Parser b -> Parser c -> Parser (List c)
