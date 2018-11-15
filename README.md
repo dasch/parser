@@ -4,6 +4,8 @@ Easy to use text parsing library for Elm.
 
 This library does not attempt to provide the fastest parsing API, nor does it allow for the most flexibility when it comes to error messages and contextual feedback. Rather, this library seeks to provide an intuitive, easy to use API for writing parsers that don't need to be crazy fast or provide detailed error messages.
 
+**Status:** This library is pretty new and probably has a bunch of bugs. Please try it out and report things to the Github issue tracker! However, don't expect this to be rock solid quite yet.
+
 
 ## Examples
 
