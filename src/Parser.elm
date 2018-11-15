@@ -67,10 +67,7 @@ module Parser exposing
 
 
 {-| A `Parser a` is an instruction for how to take some input text and turn it
-into an `a` value as an updated input text that has had some prefix removed.
-
-If a parser fails to turn the input into a value, it fails with `Error`.
-
+into an `a` value.
 -}
 type Parser a
     = Parser (State -> Result Error ( State, a ))
