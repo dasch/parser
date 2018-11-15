@@ -221,6 +221,7 @@ a version number included:
                         fail ("unknown spec version " ++ String.fromInt x)
         in
         string "version="
+            |> followedBy int
             |> andThen specByVersion
 
 -}
