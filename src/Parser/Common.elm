@@ -1,5 +1,6 @@
 module Parser.Common exposing
     ( int, float, word
+    , iso8601
     , alpha, alphaNum, digit, upper, lower
     , space, tab, blank, blanks, newline
     )
@@ -10,6 +11,11 @@ module Parser.Common exposing
 # High Level Parsers
 
 @docs int, float, word
+
+
+# Date & Time
+
+@docs iso8601
 
 
 # Single-Character Parsers
@@ -90,6 +96,66 @@ word =
         |> withError "expected word"
 
 
+{-| Matches valid [ISO8601](https://en.wikipedia.org/wiki/ISO_8601)
+datetimes.
+-}
+iso8601 : Parser String
+iso8601 =
+    let
+        date =
+            year
+                |> followedBy (char '-')
+                |> followedBy month
+                |> followedBy (char '-')
+                |> followedBy day
+
+        time =
+            char 'T'
+                |> followedBy hour
+                |> followedBy (char ':')
+                |> followedBy minute
+                |> followedBy (char ':')
+                |> followedBy second
+                |> followedBy (maybe fraction)
+                |> followedBy (maybe zone)
+
+        zone =
+            oneOf [ dropValue (char 'Z'), offset ]
+
+        offset =
+            oneOf [ char '-', char '+' ]
+                |> followedBy hour
+                |> followedBy (char ':')
+                |> followedBy minute
+                |> dropValue
+
+        year =
+            repeat 4 digit
+
+        month =
+            repeat 2 digit
+
+        day =
+            repeat 2 digit
+
+        hour =
+            repeat 2 digit
+
+        minute =
+            repeat 2 digit
+
+        second =
+            repeat 2 digit
+
+        fraction =
+            char '.'
+                |> followedBy (upto 9 digit)
+    in
+    date
+        |> followedBy (maybe time)
+        |> matchedString
+
+
 {-| Matches an alphabetic character.
 -}
 alpha : Parser Char
@@ -158,3 +224,23 @@ blanks =
 newline : Parser Char
 newline =
     char '\n'
+
+
+dropValue : Parser a -> Parser ()
+dropValue parser =
+    parser
+        |> followedBy (succeed ())
+
+
+upto : Int -> Parser a -> Parser (List a)
+upto n parser =
+    if n == 0 then
+        succeed []
+
+    else if n > 0 then
+        parser
+            |> followedBy (upto (n - 1) parser)
+            |> orElse (succeed [])
+
+    else
+        fail "n must be at least 0"

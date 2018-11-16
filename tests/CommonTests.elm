@@ -96,6 +96,38 @@ suite =
                         |> parse "\n"
                         |> Expect.equal (Ok '\n')
             ]
+        , describe "iso8601" <|
+            let
+                examples =
+                    [ "1970-01-01"
+                    , "1970-01-01T00:00:00.000Z"
+                    , "1970-01-01T00:00:00Z"
+                    , "2012-04-01T00:00:00-05:00"
+                    , "2012-11-12T00:00:00+01:00"
+                    , "2018-08-31T23:25:16.019345+02:00"
+                    , "2018-08-31T23:25:16.019345123+02:00"
+                    ]
+
+                testFor example =
+                    test ("matches " ++ example) <|
+                        \_ ->
+                            Expect.equal (Ok example) (parse example parser)
+
+                parser =
+                    into identity
+                        |> grab iso8601
+                        |> ignore end
+            in
+            List.append (List.map testFor examples)
+                [ test "+1:00 is an invalid UTC offset (should be +01:00)" <|
+                    \_ ->
+                        parse "2012-04-01T00:00:00+1:00" (iso8601 |> followedBy end)
+                            |> Expect.err
+                , test "-5:00 is an invalid UTC offset (should be -05:00)" <|
+                    \_ ->
+                        parse "2012-04-01T00:00:00-5:00" (iso8601 |> followedBy end)
+                            |> Expect.err
+                ]
         ]
 
 
