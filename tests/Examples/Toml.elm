@@ -4,6 +4,7 @@ import Dict exposing (Dict)
 import Iso8601
 import Parser exposing (..)
 import Parser.Common exposing (..)
+import Parser.MaybeCommon exposing (..)
 import Time
 
 
@@ -162,39 +163,3 @@ key : Parser String
 key =
     oneOrMore (when Char.isAlphaNum)
         |> map String.fromList
-
-
-blankLines : Parser ()
-blankLines =
-    zeroOrMore blankLine
-        |> map (\_ -> ())
-
-
-blankLine : Parser ()
-blankLine =
-    succeed ()
-        |> ignore blanks
-        |> ignore newline
-
-
-between : Parser a -> Parser b -> Parser c -> Parser (List c)
-between open close inner =
-    succeed identity
-        |> ignore open
-        |> grab (until close inner)
-        |> ignore close
-
-
-fromResult : Parser (Result String a) -> Parser a
-fromResult parser =
-    let
-        resultToParser result =
-            case result of
-                Ok v ->
-                    succeed v
-
-                Err err ->
-                    fail err
-    in
-    parser
-        |> andThen resultToParser
