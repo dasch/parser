@@ -1,14 +1,17 @@
 module Examples.Toml exposing (Value(..), parse, parseValue)
 
 import Dict exposing (Dict)
+import Iso8601
 import Parser exposing (..)
 import Parser.Common exposing (..)
+import Time
 
 
 type Value
     = TomlString String
     | TomlInt Int
     | TomlBool Bool
+    | TomlDatetime Time.Posix
     | TomlArray (List Value)
     | TomlTable (Dict String Value)
 
@@ -36,7 +39,7 @@ document =
 
 value : Parser Value
 value =
-    oneOf [ bool, int, multilineString, string, array ]
+    oneOf [ bool, datetime, int, multilineString, string, array ]
 
 
 paddedValue : Parser Value
@@ -90,6 +93,19 @@ multilineString =
 doubleQuote : Parser Char
 doubleQuote =
     char '"'
+
+
+datetime : Parser Value
+datetime =
+    let
+        parseTime input =
+            Iso8601.toTime input
+                |> Result.mapError (always "invalid datetime")
+    in
+    iso8601
+        |> map parseTime
+        |> fromResult
+        |> map TomlDatetime
 
 
 array : Parser Value
@@ -167,3 +183,18 @@ between open close inner =
         |> ignore open
         |> grab (until close inner)
         |> ignore close
+
+
+fromResult : Parser (Result String a) -> Parser a
+fromResult parser =
+    let
+        resultToParser result =
+            case result of
+                Ok v ->
+                    succeed v
+
+                Err err ->
+                    fail err
+    in
+    parser
+        |> andThen resultToParser

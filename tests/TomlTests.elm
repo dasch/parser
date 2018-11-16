@@ -4,6 +4,7 @@ import Dict
 import Examples.Toml exposing (..)
 import Expect exposing (Expectation)
 import Test exposing (..)
+import Time
 
 
 suite : Test
@@ -52,6 +53,12 @@ suite =
                 \_ ->
                     parseValue "false"
                         |> expectValue (TomlBool False)
+            ]
+        , describe "datetimes"
+            [ test "valid iso8601 datetime" <|
+                \_ ->
+                    parseValue "1979-05-27T07:32:00Z"
+                        |> expectValue (TomlDatetime (Time.millisToPosix 296638320000))
             ]
         , tableTests
         , describe "arrays"
