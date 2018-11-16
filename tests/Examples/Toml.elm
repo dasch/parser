@@ -36,6 +36,9 @@ document =
         |> grab (zeroOrMore keyValue)
         |> ignore blankLines
         |> grab (zeroOrMore table)
+        |> ignore blankLines
+        |> ignore blanks
+        |> ignore end
 
 
 value : Parser Value
