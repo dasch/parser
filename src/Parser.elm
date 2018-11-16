@@ -266,8 +266,11 @@ orElse fallback parser =
     Parser <|
         \state ->
             case run parser state of
-                Err _ ->
+                Err ( err, Uncommitted ) ->
                     run fallback state
+
+                Err failure ->
+                    Err failure
 
                 Ok ( newState, x ) ->
                     Ok ( newState, x )
@@ -433,7 +436,6 @@ repeat n parser =
 oneOf : List (Parser a) -> Parser a
 oneOf parsers =
     List.foldl orElse (fail "") parsers
-        |> withError "expected one of the parsers to match"
 
 
 {-| Commits the parser to the current branch in a `oneOf` context.
