@@ -3,7 +3,7 @@ module Parser exposing
     , parse, succeed, fail, lazy
     , char, string
     , anyChar, when, except, end, chomp
-    , oneOf
+    , oneOf, commit
     , maybe, zeroOrMore, oneOrMore, sequence, repeat, until
     , andThen, orElse, followedBy
     , into, grab, ignore
@@ -36,7 +36,7 @@ module Parser exposing
 
 # Matching Multiple Different Patterns
 
-@docs oneOf
+@docs oneOf, commit
 
 
 # Matching Sequences
@@ -434,6 +434,16 @@ oneOf : List (Parser a) -> Parser a
 oneOf parsers =
     List.foldl orElse (fail "") parsers
         |> withError "expected one of the parsers to match"
+
+
+{-| Commits the parser to the current branch in a `oneOf` context.
+-}
+commit : Parser a -> Parser a
+commit parser =
+    Parser <|
+        \state ->
+            run parser state
+                |> Result.mapError (\( err, _ ) -> ( err, Committed ))
 
 
 peek : Int -> State -> List Char

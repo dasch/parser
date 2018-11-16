@@ -156,6 +156,7 @@ keyValue =
         |> grab key
         |> ignore blanks
         |> ignore (char '=')
+        |> commit
         |> ignore blanks
         |> grab (lazy (\_ -> value))
         |> ignore blanks
