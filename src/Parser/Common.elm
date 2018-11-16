@@ -161,6 +161,7 @@ iso8601 =
 alpha : Parser Char
 alpha =
     when Char.isAlpha
+        |> withError "expected alphabetic char"
 
 
 {-| Matches an alphanumeric character.
@@ -168,6 +169,7 @@ alpha =
 alphaNum : Parser Char
 alphaNum =
     when Char.isAlphaNum
+        |> withError "expected alphanumeric char"
 
 
 {-| Matches a digit, e.g. `8`.
@@ -175,6 +177,7 @@ alphaNum =
 digit : Parser Char
 digit =
     when Char.isDigit
+        |> withError "expected digit"
 
 
 {-| Matches an uppercase alphabetic characters, e.g. `A`.
@@ -182,6 +185,7 @@ digit =
 upper : Parser Char
 upper =
     when Char.isUpper
+        |> withError "expected uppercase char"
 
 
 {-| Matches a lowercase alphabetic characters, e.g. `z`.
@@ -189,6 +193,7 @@ upper =
 lower : Parser Char
 lower =
     when Char.isLower
+        |> withError "expected lowercase char"
 
 
 {-| Matches the space character, \`\`.
