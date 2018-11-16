@@ -160,8 +160,13 @@ tableTests =
 
 
 expectValue : Value -> Result String Value -> Expectation
-expectValue expected =
-    Expect.equal (Ok expected)
+expectValue expected result =
+    case result of
+        Ok actual ->
+            Expect.equal expected actual
+
+        Err err ->
+            Expect.fail err
 
 
 multilineString =
