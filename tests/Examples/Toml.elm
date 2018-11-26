@@ -59,11 +59,11 @@ bool =
     let
         true =
             Parser.string "true"
-                |> map (\_ -> True)
+                |> map (always True)
 
         false =
             Parser.string "false"
-                |> map (\_ -> False)
+                |> map (always False)
     in
     oneOf [ true, false ]
         |> map TomlBool
