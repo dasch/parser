@@ -56,7 +56,7 @@ dict : Parser Value
 dict =
     let
         kvPair =
-            into (\k v -> ( k, v ))
+            into Tuple.pair
                 |> grab rawString
                 |> grab (lazy (\_ -> value))
     in
