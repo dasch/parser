@@ -1,4 +1,4 @@
-module Parser.MaybeCommon exposing (between, blankLine, blankLines, fromResult)
+module Parser.MaybeCommon exposing (between, blankLine, blankLines, formatError, fromResult)
 
 {-| Candidates for inclusion in Parser.Common and Parser.
 -}
@@ -41,3 +41,22 @@ fromResult parser =
     in
     parser
         |> andThen resultToParser
+
+
+formatError : String -> Error -> String
+formatError input { message, position } =
+    let
+        context =
+            10
+
+        slice =
+            String.slice (position - context) (position + context) input
+                |> Debug.toString
+
+        cursor =
+            position - context
+
+        padding =
+            String.repeat context " "
+    in
+    slice ++ "\n" ++ padding ++ "^ " ++ message

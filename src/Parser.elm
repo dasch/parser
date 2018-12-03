@@ -3,7 +3,7 @@ module Parser exposing
     , parse, succeed, fail, lazy
     , char, string
     , anyChar, when, except, end, chomp
-    , oneOf
+    , oneOf, commit
     , maybe, zeroOrMore, oneOrMore, sequence, repeat, until
     , andThen, orElse, followedBy
     , into, grab, ignore
@@ -36,7 +36,7 @@ module Parser exposing
 
 # Matching Multiple Different Patterns
 
-@docs oneOf
+@docs oneOf, commit
 
 
 # Matching Sequences
@@ -70,7 +70,7 @@ module Parser exposing
 into an `a` value.
 -}
 type Parser a
-    = Parser (State -> Result Error ( State, a ))
+    = Parser (State -> Result Failure ( State, a ))
 
 
 {-| The state of a parsing process.
@@ -92,6 +92,17 @@ type alias Error =
     }
 
 
+type Commitment
+    = Committed
+    | Uncommitted
+
+
+{-| An error and whether the parser had committed to its branch.
+-}
+type alias Failure =
+    ( Error, Commitment )
+
+
 init : String -> State
 init input =
     State
@@ -101,7 +112,7 @@ init input =
         }
 
 
-run : Parser a -> State -> Result Error ( State, a )
+run : Parser a -> State -> Result Failure ( State, a )
 run (Parser parser) state =
     parser state
 
@@ -118,6 +129,7 @@ parse : String -> Parser a -> Result Error a
 parse input parser =
     run parser (init input)
         |> Result.map (\( _, value ) -> value)
+        |> Result.mapError Tuple.first
 
 
 {-| A parser that always succeeds with a specified value without reading any input.
@@ -142,7 +154,7 @@ fail : String -> Parser a
 fail str =
     Parser <|
         \(State state) ->
-            Err { message = str, position = state.position }
+            Err ( { message = str, position = state.position }, Uncommitted )
 
 
 {-| In order to support self-referential parsers, you need to introduce lazy
@@ -193,7 +205,7 @@ withError msg parser =
     Parser <|
         \state ->
             run parser state
-                |> Result.mapError (\err -> { err | message = msg })
+                |> Result.mapError (\( err, c ) -> ( { err | message = msg }, c ))
 
 
 {-| Create a parser that depends on the previous parser's result.
@@ -254,8 +266,11 @@ orElse fallback parser =
     Parser <|
         \state ->
             case run parser state of
-                Err _ ->
+                Err ( err, Uncommitted ) ->
                     run fallback state
+
+                Err failure ->
+                    Err failure
 
                 Ok ( newState, x ) ->
                     Ok ( newState, x )
@@ -421,7 +436,16 @@ repeat n parser =
 oneOf : List (Parser a) -> Parser a
 oneOf parsers =
     List.foldl orElse (fail "") parsers
-        |> withError "expected one of the parsers to match"
+
+
+{-| Commits the parser to the current branch in a `oneOf` context.
+-}
+commit : Parser a -> Parser a
+commit parser =
+    Parser <|
+        \state ->
+            run parser state
+                |> Result.mapError (\( err, _ ) -> ( err, Committed ))
 
 
 peek : Int -> State -> List Char
@@ -506,7 +530,7 @@ end =
                 Ok ( State state, () )
 
             else
-                Err { message = "expected end", position = state.position }
+                run (fail "expected end") (State state)
 
 
 {-| Matches any character.
@@ -517,7 +541,7 @@ anyChar =
         \(State state) ->
             List.head state.remaining
                 |> Maybe.map (\chr -> ( advance 1 (State state), chr ))
-                |> Result.fromMaybe { message = "expected any char", position = state.position }
+                |> Result.fromMaybe ( { message = "expected any char", position = state.position }, Uncommitted )
 
 
 {-| Matches a character if some predicate holds.

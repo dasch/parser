@@ -20,7 +20,7 @@ type Value
 parse : String -> Result String Value
 parse input =
     Parser.parse input document
-        |> Result.mapError .message
+        |> Result.mapError (formatError input)
 
 
 parseValue : String -> Result String Value
@@ -156,6 +156,7 @@ keyValue =
         |> grab key
         |> ignore blanks
         |> ignore (char '=')
+        |> commit
         |> ignore blanks
         |> grab (lazy (\_ -> value))
         |> ignore blanks

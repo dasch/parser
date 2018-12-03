@@ -97,7 +97,12 @@ suite =
                     oneOf [ string "goodbye", string "hello" ]
                         |> andThen (\_ -> anyChar)
                         |> parse "yolo"
-                        |> Expect.equal (Err { message = "expected one of the parsers to match", position = 0 })
+                        |> Expect.equal (Err { message = "expected char h", position = 0 })
+            , test "omits the rest of the branches if a committed branch fails" <|
+                \_ ->
+                    oneOf [ commit (char 'x'), char 'y' ]
+                        |> parse "y"
+                        |> Expect.equal (Err { message = "expected char x", position = 0 })
             ]
         , describe "zeroOrMore"
             [ test "it succeeds if there are no matches" <|
