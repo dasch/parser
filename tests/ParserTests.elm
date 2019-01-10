@@ -39,7 +39,8 @@ suite =
                 \_ ->
                     when Char.isUpper
                         |> parse "hello world"
-                        |> Expect.equal (Err { message = "failed predicate", position = 1 })
+                        |> Result.mapError .message
+                        |> Expect.equal (Err "failed predicate")
             ]
         , describe "maybe"
             [ test "succeeds with Nothing if the parser fails" <|
@@ -77,7 +78,8 @@ suite =
                 \_ ->
                     end
                         |> parse "hello"
-                        |> Expect.equal (Err { message = "expected end", position = 0 })
+                        |> Result.mapError .message
+                        |> Expect.equal (Err "expected end")
             ]
         , describe "oneOf"
             [ test "it can pick the first choice" <|
@@ -97,7 +99,8 @@ suite =
                     oneOf [ string "goodbye", string "hello" ]
                         |> andThen (\_ -> anyChar)
                         |> parse "yolo"
-                        |> Expect.equal (Err { message = "expected one of the parsers to match", position = 0 })
+                        |> Result.mapError .message
+                        |> Expect.equal (Err "expected one of the parsers to match")
             ]
         , describe "zeroOrMore"
             [ test "it succeeds if there are no matches" <|
@@ -121,7 +124,8 @@ suite =
                 \_ ->
                     oneOrMore (char 'x')
                         |> parse "yyy"
-                        |> Expect.equal (Err { message = "expected char x", position = 0 })
+                        |> Result.mapError .message
+                        |> Expect.equal (Err "expected char x")
             , test "it matches one time" <|
                 \_ ->
                     oneOrMore (char 'x')
@@ -179,7 +183,8 @@ suite =
                 \_ ->
                     except (char 'x')
                         |> parse "xyz"
-                        |> Expect.equal (Err { message = "expected to not match", position = 0 })
+                        |> Result.mapError .message
+                        |> Expect.equal (Err "expected to not match")
             , test "matches any char if the argument fails" <|
                 \_ ->
                     except (char 'x')

@@ -1,6 +1,6 @@
 module Parser exposing
     ( Parser, Error
-    , parse, succeed, fail, lazy
+    , parse, inContext, succeed, fail, lazy
     , char, string
     , anyChar, when, except, end, chomp
     , oneOf
@@ -21,7 +21,7 @@ module Parser exposing
 
 # Core
 
-@docs parse, succeed, fail, lazy
+@docs parse, inContext, succeed, fail, lazy
 
 
 # Matching Specific Text
@@ -80,6 +80,7 @@ type State
         { input : String
         , remaining : List Char
         , position : Int
+        , context : Maybe String
         }
 
 
@@ -89,6 +90,7 @@ what position into the input text it failed.
 type alias Error =
     { message : String
     , position : Int
+    , context : Maybe String
     }
 
 
@@ -98,6 +100,7 @@ init input =
         { input = input
         , remaining = String.toList input
         , position = 0
+        , context = Nothing
         }
 
 
@@ -142,7 +145,16 @@ fail : String -> Parser a
 fail str =
     Parser <|
         \(State state) ->
-            Err { message = str, position = state.position }
+            Err { message = str, position = state.position, context = state.context }
+
+
+{-| Sets the context of the parser. Useful for providing better error messages.
+-}
+inContext : String -> Parser a -> Parser a
+inContext context parser =
+    Parser <|
+        \(State state) ->
+            run parser (State { state | context = Just context })
 
 
 {-| In order to support self-referential parsers, you need to introduce lazy
@@ -506,7 +518,7 @@ end =
                 Ok ( State state, () )
 
             else
-                Err { message = "expected end", position = state.position }
+                Err { message = "expected end", position = state.position, context = state.context }
 
 
 {-| Matches any character.
@@ -517,7 +529,7 @@ anyChar =
         \(State state) ->
             List.head state.remaining
                 |> Maybe.map (\chr -> ( advance 1 (State state), chr ))
-                |> Result.fromMaybe { message = "expected any char", position = state.position }
+                |> Result.fromMaybe { message = "expected any char", position = state.position, context = state.context }
 
 
 {-| Matches a character if some predicate holds.

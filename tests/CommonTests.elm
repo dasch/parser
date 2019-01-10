@@ -19,7 +19,8 @@ suite =
                 \_ ->
                     int
                         |> parse "yolo42"
-                        |> Expect.equal (Err { message = "expected int", position = 1 })
+                        |> Result.mapError .message
+                        |> Expect.equal (Err "expected int")
             ]
         , describe "float"
             [ test "it matches valid floats" <|
@@ -49,7 +50,8 @@ suite =
                 \_ ->
                     word
                         |> parse "%hello"
-                        |> Expect.equal (Err { message = "expected word", position = 0 })
+                        |> Result.mapError .message
+                        |> Expect.equal (Err "expected word")
             ]
         , describe "space"
             [ test "matches a space" <|
