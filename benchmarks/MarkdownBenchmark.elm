@@ -1,4 +1,4 @@
-module Main exposing (input, suite)
+module Main exposing (suite)
 
 import Benchmark exposing (..)
 import Benchmark.Runner exposing (BenchmarkProgram, program)
