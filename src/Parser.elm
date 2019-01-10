@@ -621,12 +621,12 @@ chomp n =
 char : Char -> Parser Char
 char chr =
     Parser <|
-        \(State state) ->
+        \((State state) as fullState) ->
             if List.head state.remaining == Just chr then
-                Ok ( advance 1 (State state), chr )
+                Ok ( advance 1 fullState, chr )
 
             else
-                run (fail ("expected char " ++ String.fromChar chr)) (State state)
+                run (fail ("expected char " ++ String.fromChar chr)) fullState
 
 
 {-| Matches a specific string.
