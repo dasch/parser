@@ -350,7 +350,7 @@ ignore next =
     andThen
         (\b ->
             next
-                |> andThen (\_ -> succeed b)
+                |> followedBy (succeed b)
         )
 
 
