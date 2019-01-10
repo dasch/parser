@@ -379,10 +379,8 @@ an empty list if there are no occurrences.
 -}
 zeroOrMore : Parser a -> Parser (List a)
 zeroOrMore parser =
-    oneOf
-        [ map2 (::) parser (lazy (\_ -> zeroOrMore parser))
-        , succeed []
-        ]
+    map2 (::) parser (lazy (\_ -> zeroOrMore parser))
+        |> orElse (succeed [])
 
 
 {-| Matches one or more successive occurrences of a value. Fails if
