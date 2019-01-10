@@ -120,7 +120,7 @@ either the parsed value or an error.
 parse : String -> Parser a -> Result Error a
 parse input parser =
     run parser (init input)
-        |> Result.map (\( _, value ) -> value)
+        |> Result.map Tuple.second
 
 
 {-| A parser that always succeeds with a specified value without reading any input.
