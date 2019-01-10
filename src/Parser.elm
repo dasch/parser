@@ -434,11 +434,6 @@ oneOf parsers =
         |> withError "expected one of the parsers to match"
 
 
-peek : Int -> State -> List Char
-peek length (State state) =
-    List.take length state.remaining
-
-
 advance : Int -> State -> State
 advance length (State state) =
     State
