@@ -17,6 +17,15 @@ suite =
                     repeat 3 (char 'x')
             in
             \_ -> parse input parser
+        , benchmark "string" <|
+            let
+                input =
+                    "helloworld"
+
+                parser =
+                    string "hello"
+            in
+            \_ -> parse input parser
         ]
 
 
