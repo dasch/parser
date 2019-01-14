@@ -266,11 +266,11 @@ orElse fallback parser =
     Parser <|
         \state ->
             case run parser state of
+                (Ok _) as result ->
+                    result
+
                 Err _ ->
                     run fallback state
-
-                Ok ( newState, x ) ->
-                    Ok ( newState, x )
 
 
 {-| Map the value of a parser.
