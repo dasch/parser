@@ -631,7 +631,17 @@ char chr =
 -}
 string : String -> Parser String
 string str =
-    String.toList str
-        |> List.map char
-        |> sequence
-        |> map String.fromList
+    Parser <|
+        let
+            strLength =
+                String.length str
+
+            chars =
+                String.toList str
+        in
+        \((State state) as fullState) ->
+            if List.take strLength state.remaining == chars then
+                Ok ( advance strLength fullState, str )
+
+            else
+                run (fail ("expected string `" ++ str ++ "`")) fullState
