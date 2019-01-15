@@ -11,6 +11,7 @@ type alias Document =
 type Block
     = Paragraph (List Inline)
     | OrderedList (List Block)
+    | UnorderedList (List Block)
     | Heading Int (List Inline)
 
 
@@ -27,7 +28,9 @@ parse input =
 
 document : Parser Document
 document =
-    oneOrMore block
+    into identity
+        |> grab (oneOrMore block)
+        |> ignore end
 
 
 block : Parser Block
