@@ -1,6 +1,7 @@
 module Parser.Common exposing
     ( int, float, word
     , iso8601
+    , url
     , alpha, alphaNum, digit, upper, lower
     , space, tab, blank, blanks, newline
     )
@@ -18,6 +19,11 @@ module Parser.Common exposing
 @docs iso8601
 
 
+# Special Types
+
+@docs url
+
+
 # Single-Character Parsers
 
 @docs alpha, alphaNum, digit, upper, lower
@@ -30,6 +36,7 @@ module Parser.Common exposing
 -}
 
 import Parser exposing (..)
+import Url exposing (Url)
 
 
 {-| Matches an integer.
@@ -249,3 +256,54 @@ upto n parser =
 
     else
         fail "n must be at least 0"
+
+
+url : Parser Url
+url =
+    let
+        protocol : Parser Url.Protocol
+        protocol =
+            oneOf
+                [ string "https://" |> map (always Url.Https)
+                , string "http://" |> map (always Url.Http)
+                ]
+
+        host : Parser String
+        host =
+            until (oneOf [ char ':', char '/' ]) anyChar
+                |> stringWith
+
+        port_ : Parser Int
+        port_ =
+            char ':'
+                |> followedBy int
+
+        path : Parser String
+        path =
+            until (oneOf [ ignored (char '?'), ignored (char '#'), end ]) anyChar
+                |> orElse (succeed [])
+                |> stringWith
+
+        query : Parser String
+        query =
+            char '?'
+                |> followedBy (until (oneOf [ ignored (char '#'), end ]) anyChar)
+                |> stringWith
+
+        fragment : Parser String
+        fragment =
+            char '#'
+                |> followedBy (until end anyChar)
+                |> stringWith
+
+        ignored : Parser a -> Parser ()
+        ignored parser =
+            map (always ()) parser
+    in
+    into Url
+        |> grab protocol
+        |> grab host
+        |> grab (maybe port_)
+        |> grab path
+        |> grab (maybe query)
+        |> grab (maybe fragment)
