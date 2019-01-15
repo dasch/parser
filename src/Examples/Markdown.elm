@@ -36,7 +36,7 @@ document =
 block : Parser Block
 block =
     zeroOrMore emptyLine
-        |> followedBy (oneOf [ heading, orderedList, paragraph ])
+        |> followedBy (oneOf [ heading, orderedList, unorderedList, paragraph ])
         |> inContext "block"
 
 
@@ -129,6 +129,23 @@ orderedList =
     in
     oneOrMore item
         |> map OrderedList
+
+
+unorderedList : Parser Block
+unorderedList =
+    let
+        marker =
+            char '*'
+                |> followedBy (oneOrMore blank)
+
+        item : Parser Block
+        item =
+            marker
+                |> followedBy inline
+                |> map Paragraph
+    in
+    oneOrMore item
+        |> map UnorderedList
 
 
 emptyLine : Parser String
