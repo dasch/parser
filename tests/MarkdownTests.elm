@@ -44,6 +44,11 @@ suite =
                                 , StrongEmphasis "emphasis"
                                 , Text "!"
                                 ]
+                            , UnorderedList
+                                [ Paragraph [ Text "And" ]
+                                , Paragraph [ Text "Unordered" ]
+                                , Paragraph [ Text "Lists!" ]
+                                ]
                             ]
                     in
                     parse input
