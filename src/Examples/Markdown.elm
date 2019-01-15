@@ -28,9 +28,7 @@ parse input =
 
 document : Parser Document
 document =
-    into identity
-        |> grab (oneOrMore block)
-        |> ignore end
+    until end block
 
 
 block : Parser Block
