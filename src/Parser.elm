@@ -449,6 +449,9 @@ advance length (State state) =
         |> followedBy (until (char ']') anyChar)
         |> parse "[abc]" -- Ok [ 'a', 'b', 'c' ]
 
+Importantly, the "stop" parser does not actually consume any input, so in the
+example above, the parser position would be between `c` and `]`.
+
 -}
 until : Parser a -> Parser b -> Parser (List b)
 until stop parser =
