@@ -1,10 +1,9 @@
-module CommonTests exposing (expectMatch, suite)
+module CommonTests exposing (suite)
 
 import Expect exposing (Expectation)
 import Parser exposing (..)
 import Parser.Common exposing (..)
 import Test exposing (..)
-import Url
 
 
 suite : Test
@@ -131,21 +130,6 @@ suite =
                         parse "2012-04-01T00:00:00-5:00" (iso8601 |> followedBy end)
                             |> Expect.err
                 ]
-        , describe "url"
-            [ test "parses URLs" <|
-                \_ ->
-                    let
-                        example =
-                            "http://hello.com/world?x=42&y=13#nice"
-                    in
-                    parse example url
-                        |> Result.map Url.toString
-                        |> Expect.equal (Ok example)
-            , test "fails on invalid URLs" <|
-                \_ ->
-                    parse "omg://yolo.com" url
-                        |> Expect.err
-            ]
         ]
 
 
