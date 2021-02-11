@@ -1,4 +1,4 @@
-module CommonTests exposing (expectMatch, suite)
+module CommonTests exposing (suite)
 
 import Expect exposing (Expectation)
 import Parser exposing (..)
